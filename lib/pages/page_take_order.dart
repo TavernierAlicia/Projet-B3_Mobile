@@ -65,7 +65,106 @@ class _PageTakeOrderState extends State<PageTakeOrder> {
       width: _screenWidth,
       height: _screenHeight,
       color: Colors.deepOrange,
-      child: (Text("OK")),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Stack(
+            alignment: Alignment.center,
+            children: <Widget>[
+              Image.asset("assets/circle.png"),
+              Image.asset("assets/valid.png"),
+            ],
+          ),
+          Padding(padding: EdgeInsets.all(15),),
+          Text(
+            "Paiement validé".toUpperCase(),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Padding(padding: EdgeInsets.all(15),),
+          Flexible(
+            child: Padding(
+              padding: EdgeInsets.only(left: 50, right: 50),
+              child: Text(
+                "L'achat a été réalisé avec succès. Veuillez consulter votre commande.",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+          Padding(padding: EdgeInsets.all(20),),
+          InkWell(
+            onTap: (() {
+              // TODO
+            }),
+            child: Padding(
+              padding: EdgeInsets.only(left: 50, right: 50),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(
+                      color: Colors.white,
+                      style: BorderStyle.none
+                  ),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 15, bottom: 15),
+                    child: Text(
+                      "Voir la commande",
+                      style: TextStyle(
+                        color: Colors.deepOrange,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(padding: EdgeInsets.all(10),),
+          InkWell(
+            onTap: (() {
+              // TODO
+            }),
+            child: Padding(
+              padding: EdgeInsets.only(left: 50, right: 50),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(
+                      color: Colors.white,
+                      style: BorderStyle.none
+                  ),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 15, bottom: 15),
+                    child: Text(
+                      "Retour à l'accueil",
+                      style: TextStyle(
+                        color: Colors.deepOrange,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
