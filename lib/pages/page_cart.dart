@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:projet_b3/model/bar.dart';
 import 'package:projet_b3/model/product.dart';
+import 'package:projet_b3/pages/page_take_order.dart';
 import 'package:projet_b3/views/bar_header.dart';
 
 class PageCart extends StatefulWidget {
@@ -62,7 +63,17 @@ class _PageCartState extends State<PageCart> {
       body: _body(),
       bottomSheet: InkWell(
         onTap: (() {
-          
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PageTakeOrder(
+                bar: widget.bar,
+                cartContent: widget.cartContent,
+                arrivingIn: _selectedArrivingIn,
+                paymentMethod: _selectedPaymentMethod,
+              ),
+            ),
+          );
         }),
         child: Container(
           width: _screenWidth,

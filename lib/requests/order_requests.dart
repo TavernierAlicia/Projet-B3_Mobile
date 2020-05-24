@@ -3,9 +3,10 @@ import 'package:projet_b3/model/bar.dart';
 import 'package:projet_b3/model/product.dart';
 import 'package:projet_b3/pages/page_cart.dart';
 import 'package:projet_b3/requests/utils.dart';
+import 'package:http/http.dart';
 
 Future<String>  takeOrder(Bar bar, List<Product> cartContent, int arrivingIn,
-    PaymentMethod paymentMethod) {
+    PaymentMethod paymentMethod) async {
   String                url = BASE_URL + "takeOrder" ;
   Map<String, String>   headers = {
     "Authorization" : "dcdb199e-2797-4041-8b26-08bc451dd47b"
@@ -32,4 +33,8 @@ Future<String>  takeOrder(Bar bar, List<Product> cartContent, int arrivingIn,
   """ ;
 
   print("JSON BODY == $jsonBody");
+
+  Response    response = await post(url, headers: headers, body: jsonBody);
+  print("RESPONSE BODY = ${response.body}");
+  return response.body ;
 }
