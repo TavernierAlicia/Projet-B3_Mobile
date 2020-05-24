@@ -15,6 +15,7 @@ class PageOrders extends StatefulWidget {
 class _PageOrdersState extends State<PageOrders> {
 
   var _ordersList = [
+    /*
     Order(
       Bar(
         "Gatsby Bar",
@@ -75,6 +76,7 @@ class _PageOrdersState extends State<PageOrders> {
         ],
         12.3
     ),
+    */
   ];
 
   @override
