@@ -19,10 +19,17 @@ enum UserPosition {
   onMyWay,
 }
 
+enum PaymentMethod {
+  cb,
+  payPal,
+  cash,
+}
+
 class _PageCartState extends State<PageCart> {
 
   double          _screenWidth = 0 ;
   UserPosition    _currentUserPosition = UserPosition.unspecified ;
+  PaymentMethod   _selectedPaymentMethod = PaymentMethod.cash ;
 
   static const String DEFAULT_ARRIVING_IN_TEXT = "J'arrive dans quelques minutes" ;
 
@@ -102,12 +109,36 @@ class _PageCartState extends State<PageCart> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
-            Image.asset("assets/cb.png"),
-            Image.asset("assets/paypal.png"),
-            Image.asset("assets/money.png"),
+            _paymentMethodItem(PaymentMethod.cb, "assets/cb.png"),
+            _paymentMethodItem(PaymentMethod.payPal, "assets/paypal.png"),
+            _paymentMethodItem(PaymentMethod.cash, "assets/money.png"),
           ],
         ),
       ],
+    );
+  }
+
+  Widget    _paymentMethodItem(PaymentMethod paymentMethod, String imagePath) {
+    return GestureDetector(
+      onTap: (() {
+        setState(() {
+          _selectedPaymentMethod = paymentMethod ;
+        });
+      }),
+      child: Container(
+        decoration: (_selectedPaymentMethod == paymentMethod) ? BoxDecoration(
+          border: Border.all(
+            width: 2,
+            color: Colors.deepOrange,
+            style: BorderStyle.solid,
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ) : null,
+        child: Padding(
+          padding: EdgeInsets.all(5),
+          child: Image.asset(imagePath),
+        ),
+      ),
     );
   }
 
