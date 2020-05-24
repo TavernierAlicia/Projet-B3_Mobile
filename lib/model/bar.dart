@@ -1,11 +1,11 @@
-import 'dart:convert';
-
 import 'package:latlong/latlong.dart';
+import 'dart:convert';
 
 class Bar {
 
   Bar(int id, String name, String description, String type, String subtype,
       double lat, double long, String imageUrl, String date) {
+    print("In default constructor, name = $name");
     this.id = id ;
     this.name = name ;
     this.description = description ;
@@ -17,8 +17,9 @@ class Bar {
   }
 
   factory Bar.fromJson(Map<String, dynamic> jsonMap) {
+    print("IN FACTORY : $jsonMap");
     return Bar(
-      jsonMap["id"],
+      jsonMap["Id"],
       jsonMap["Name"],
       jsonMap["Description"],
       jsonMap["Type"],

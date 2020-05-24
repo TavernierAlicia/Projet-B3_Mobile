@@ -92,7 +92,13 @@ class _PageBarsState extends State<PageBars> {
                 ),
               ]
           )
-              : Container(child: CircularProgressIndicator(),);
+              : Center(
+            child: SizedBox(
+              width: 75,
+              height: 75,
+              child: CircularProgressIndicator(),
+            ),
+          );
         },
       ),
     );
@@ -360,6 +366,7 @@ class _PageBarsState extends State<PageBars> {
                     Padding(padding: EdgeInsets.all(10),),
                     Flexible(
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
                             bar.name,
@@ -369,8 +376,8 @@ class _PageBarsState extends State<PageBars> {
                               fontWeight: FontWeight.bold
                             ),
                           ),
-                          // TODO : Category
-                          // TODO : Open hours
+                          Text("Bar a ${bar.subtype}"),
+                          Text("Ouvert jusqu'a 23h59"),
                         ],
                       ),
                     ),
@@ -396,7 +403,7 @@ class _PageBarsState extends State<PageBars> {
                         )
                     ),
                     child: Padding(
-                      padding: EdgeInsets.all(20),
+                      padding: EdgeInsets.all(17),
                       child: Text(
                         "Acceder a la carte",
                         textAlign: TextAlign.center,
