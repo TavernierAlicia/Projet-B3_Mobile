@@ -1,6 +1,9 @@
 
+import 'dart:convert';
+
 import 'package:projet_b3/model/bar.dart';
 import 'package:projet_b3/model/product.dart';
+import 'package:projet_b3/model/order.dart';
 import 'package:projet_b3/pages/page_cart.dart';
 import 'package:projet_b3/requests/utils.dart';
 import 'package:http/http.dart';
@@ -37,4 +40,17 @@ Future<String>  takeOrder(Bar bar, List<Product> cartContent, int arrivingIn,
   Response    response = await post(url, headers: headers, body: jsonBody);
   print("RESPONSE BODY = ${response.body}");
   return response.body ;
+}
+
+Future<List<Order>>     getOrdersHistory() async {
+  String        url = BASE_URL + "showOrders" ;
+  Map<String, String>   headers = {
+    "Authorization" : "dcdb199e-2797-4041-8b26-08bc451dd47b"
+  } ;
+
+  Response    response = await get(url, headers: headers) ;
+  var data = jsonDecode(response.body) as List;
+  var ordersList = data.map<Order>((json) => Order.fromJson(json)).toList();
+
+  return ordersList ;
 }

@@ -25,7 +25,7 @@ Future<List<Product>>   getBarCart(Bar bar) async {
   } ;
 
   Response  response = await get(url, headers: headers) ;
-  var       data = jsonDecode(response.body)["Items"] as List ;
+  var       data = (json.decode(response.body))["Items"] as List ;
   var       productsList = data.map<Product>((json) => Product.fromJson(json)).toList();
 
   productsList.forEach((element) {

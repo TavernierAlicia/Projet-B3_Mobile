@@ -29,7 +29,7 @@ Widget orderItem(context, Order order) {
                       shape: BoxShape.circle,
                       image: DecorationImage(
                           fit: BoxFit.fill,
-                          image: NetworkImage(order.bar.imageUrl)
+                          image: NetworkImage(order.pictureUrl)
                       )
                   ),
                 ),
@@ -38,14 +38,14 @@ Widget orderItem(context, Order order) {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    order.bar.name.toUpperCase(),
+                    order.establishmentName.toUpperCase(),
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    DateFormat.yMMMMd('fr_FR').format(order.dateTime),
+                    DateFormat.yMMMd('fr_FR').format(DateTime.parse(order.date)),
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.grey
@@ -111,7 +111,7 @@ Widget orderItem(context, Order order) {
 String  _createProductsList(Order order) {
   String result = "";
 
-  order.products.forEach((orderItem) {
+  order.orderItems.forEach((orderItem) {
     if (result.isNotEmpty)
       result += ",\n";
     result += "${orderItem.quantity} ${orderItem.name}";
