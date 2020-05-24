@@ -28,8 +28,10 @@ enum PaymentMethod {
 class _PageCartState extends State<PageCart> {
 
   double          _screenWidth = 0 ;
+
   UserPosition    _currentUserPosition = UserPosition.unspecified ;
   PaymentMethod   _selectedPaymentMethod = PaymentMethod.cash ;
+  int             _selectedArrivingIn = 0 ;
 
   static const String DEFAULT_ARRIVING_IN_TEXT = "J'arrive dans quelques minutes" ;
 
@@ -59,7 +61,9 @@ class _PageCartState extends State<PageCart> {
       ),
       body: _body(),
       bottomSheet: InkWell(
-        onTap: null,
+        onTap: (() {
+          
+        }),
         child: Container(
           width: _screenWidth,
           color: Colors.deepOrange,
@@ -216,8 +220,6 @@ class _PageCartState extends State<PageCart> {
   }
 
   Widget    _userPosition() {
-
-    // TODO : Display items if the user clicks on something
     return Padding(
       padding: EdgeInsets.only(left: 30, right: 30),
       child: Column(
@@ -228,6 +230,7 @@ class _PageCartState extends State<PageCart> {
                 _currentUserPosition = UserPosition.onTheSpot ;
                 _showTimeList = false ;
                 _arrivingInText = DEFAULT_ARRIVING_IN_TEXT ;
+                _selectedArrivingIn = 0 ;
               });
             }),
             child: Row(
@@ -295,6 +298,7 @@ class _PageCartState extends State<PageCart> {
                   setState(() {
                     _arrivingInText = "J'arrive dans $newValue minutes";
                     _showTimeList = false ;
+                    _selectedArrivingIn = newValue ;
                   });
                 }),
                 items: _arrivingInList.map((int value) {
