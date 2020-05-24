@@ -16,90 +16,102 @@ Widget orderItem(context, Order order) {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10)
       ),
-      child: Column(
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.all(15),
-                child: Container(
-                  width: _screenWidth / 4,
-                  height: _screenWidth / 4,
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                          fit: BoxFit.fill,
-                          image: NetworkImage(order.pictureUrl)
-                      )
+      child: Padding(
+        padding: EdgeInsets.only(top: 15),
+        child: Column(
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.all(15),
+                  child: Container(
+                    width: _screenWidth / 4,
+                    height: _screenWidth / 4,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                            fit: BoxFit.fill,
+                            image: NetworkImage(order.pictureUrl)
+                        )
+                    ),
                   ),
                 ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    order.establishmentName.toUpperCase(),
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                    ),
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        order.establishmentName.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        DateFormat.yMMMd('fr_FR').format(DateTime.parse(order.date)),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey
+                        ),
+                      ),
+                      Text(
+                        _createProductsList(order),
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    DateFormat.yMMMd('fr_FR').format(DateTime.parse(order.date)),
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey
-                    ),
-                  ),
-                  Text(
-                    _createProductsList(order),
-                    style: TextStyle(
-                      fontSize: 16,
-                    ),
-                  )
-                ],
+                ),
+              ],
+            ),
+            _orderAgainButton(context),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+Widget    _orderAgainButton(BuildContext scaffoldContext) {
+  return Padding(
+    padding: EdgeInsets.only(top: 10),
+    child: InkWell(
+      onTap: (() {
+        /// TODO
+        Scaffold.of(scaffoldContext).showSnackBar(SnackBar(
+          content: Text("Feature not implemented yet."),
+        ));
+      }),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.deepOrange,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(10),
+            topRight: Radius.circular(10),
+          ),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(5),
+          child:  Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: <Widget>[
+              Icon(
+                /// TODO : Set the right icon
+                Icons.sync,
+                color: Colors.white,
               ),
+              Text(
+                "Commander a nouveau",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold
+                ),
+              )
             ],
           ),
-          InkWell(
-            onTap: (() {
-              /// TODO
-              Scaffold.of(context).showSnackBar(SnackBar(
-                content: Text("Feature not implemented yet."),
-              ));
-            }),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.deepOrange,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  topRight: Radius.circular(10),
-                ),
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(5),
-                child:  Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: <Widget>[
-                    Icon(
-                      /// TODO : Set the right icon
-                      Icons.sync,
-                      color: Colors.white,
-                    ),
-                    Text(
-                      "Commander a nouveau",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      )
+        ),
+      ),
     ),
   );
 }
@@ -108,7 +120,7 @@ Widget orderItem(context, Order order) {
 /// the products list, it would be a waste of resources (memory).
 /// Instead, we create a static string containing the quantity and the product
 /// name on each line.
-String  _createProductsList(Order order) {
+String    _createProductsList(Order order) {
   String result = "";
 
   order.orderItems.forEach((orderItem) {

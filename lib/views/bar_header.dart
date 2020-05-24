@@ -10,11 +10,11 @@ Widget barHeader(Bar bar, double screenWidth) {
           width: screenWidth / 4,
           height: screenWidth / 4,
           decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                fit: BoxFit.fill,
-                image: Image.network(bar.imageUrl).image,
-              )
+            shape: BoxShape.circle,
+            image: DecorationImage(
+              fit: BoxFit.fill,
+              image: Image.network(bar.imageUrl).image,
+            ),
           ),
         ),
       ),

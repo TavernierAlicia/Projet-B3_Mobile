@@ -35,10 +35,8 @@ class _PageOrdersState extends State<PageOrders> {
     return FutureBuilder(
       future: _ordersList,
       builder: (context, snapshot) {
-        return (snapshot.data != null) ? Column(
-          children: <Widget>[
-            _orders(snapshot.data as List<Order>),
-          ],
+        return (snapshot.data != null) ? SingleChildScrollView(
+          child: _orders(snapshot.data as List<Order>),
         ) : Center(
           child: SizedBox(
             width: 100,
@@ -46,7 +44,7 @@ class _PageOrdersState extends State<PageOrders> {
             child: CircularProgressIndicator(),
           ),
         );
-      }
+      },
     );
   }
 

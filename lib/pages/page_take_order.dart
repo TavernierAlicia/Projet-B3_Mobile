@@ -55,6 +55,7 @@ class _PageTakeOrderState extends State<PageTakeOrder> {
           } else {
             return _loadingLayout();
           }
+          // TODO : else if payment failed
         },
       ),
     );
