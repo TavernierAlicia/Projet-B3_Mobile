@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:projet_b3/model/bar.dart';
 import 'package:projet_b3/model/favorite.dart';
 import 'package:projet_b3/requests/utils.dart';
 import 'package:http/http.dart';
@@ -14,4 +15,15 @@ Future<List<Favorite>>    getFavorites() async {
   var data = jsonDecode(response.body) as List ;
   var favorites = data.map<Favorite>((json) => Favorite.fromJson(json)).toList();
   return favorites ;
+}
+
+Future<String>        addToFavorites(Bar bar) async {
+  String    url = BASE_URL + "favs/add/" + bar.id.toString() ;
+  Map<String, String> headers = {
+    "Authorization" : "dcdb199e-2797-4041-8b26-08bc451dd47b"
+  } ;
+
+  Response    response = await post(url, headers: headers);
+  return response.body ;
+  // TODO : Handle fails
 }

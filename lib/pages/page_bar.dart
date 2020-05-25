@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:projet_b3/model/bar.dart';
+import 'package:projet_b3/model/bar_info.dart';
 import 'package:projet_b3/model/product.dart';
 import 'package:projet_b3/pages/page_cart.dart';
 import 'package:projet_b3/requests/bar_requests.dart';
@@ -22,20 +23,20 @@ class _PageBarState extends State<PageBar> {
   /// This is the list that the bar is selling. Static data for testing
   /// purposes.
 
-  Future<List<Product>>   _productsList ;
+  Future<BarInfo>         _barInfo ;
   List<Product>           _cartContent = [] ;
 
   @override
   void initState() {
     print("In initState ; bar = ${widget.bar.name}");
-    _productsList = getBarCart(widget.bar);
+    _barInfo = getBarInfos(widget.bar);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
 
-    var _bar = widget.bar ;
+    var   _bar = widget.bar ;
 
     _screenWidth = MediaQuery.of(context).size.width ;
 
@@ -89,30 +90,30 @@ class _PageBarState extends State<PageBar> {
   /// Displays the section that handles the offers list.
   Widget _offer(Bar bar) {
     return FutureBuilder(
-        future: _productsList,
+        future: _barInfo,
         builder: (context, snapshot) {
           return (snapshot.data != null) ? Column(
             children: <Widget>[
               barHeader(bar, _screenWidth),
-              /*Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            Column(
-              children: <Widget>[
-                GestureDetector(
-                  onTap: (() {
-                    // TODO : Add bar to favorites
-                  }),
-                  child: Image.asset(
-                    "assets/favorite_empty.png",
-                    scale: 1.5,
-                  ),
-                ),
-                Text("1234")
-              ],
-            )
-          ],
-        ),*/
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Column(
+                    children: <Widget>[
+                      GestureDetector(
+                        onTap: (() {
+                          _addBarToFavorites() ;
+                        }),
+                        child: Image.asset(
+                          "assets/favorite_empty.png",
+                          scale: 1.5,
+                        ),
+                      ),
+                      Text("1234")
+                    ],
+                  )
+                ],
+              ),
               Padding(padding: EdgeInsets.all(20),),
               Center(
                 child: Text(
@@ -133,7 +134,7 @@ class _PageBarState extends State<PageBar> {
                       delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
                         return productItem(
                             context,
-                            (snapshot.data as List<Product>)[index],
+                            (snapshot.data as BarInfo).products[index],
                             addToCart: (item) => _addToCart(item),
                             removeFromCart: (item) => _removeFromCart(item)
                         );
@@ -154,6 +155,10 @@ class _PageBarState extends State<PageBar> {
           );
         }
     );
+  }
+
+  void    _addBarToFavorites() {
+    // TODO
   }
 
   void    _addToCart(Product toAdd) {
