@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:projet_b3/model/bar.dart';
 import 'package:projet_b3/model/product.dart';
+import 'package:projet_b3/pages/page_take_order.dart';
 import 'package:projet_b3/views/bar_header.dart';
 
 class PageCart extends StatefulWidget {
@@ -19,10 +20,19 @@ enum UserPosition {
   onMyWay,
 }
 
+enum PaymentMethod {
+  cb,
+  payPal,
+  cash,
+}
+
 class _PageCartState extends State<PageCart> {
 
   double          _screenWidth = 0 ;
+
   UserPosition    _currentUserPosition = UserPosition.unspecified ;
+  PaymentMethod   _selectedPaymentMethod = PaymentMethod.cash ;
+  int             _selectedArrivingIn = 0 ;
 
   static const String DEFAULT_ARRIVING_IN_TEXT = "J'arrive dans quelques minutes" ;
 
@@ -52,7 +62,19 @@ class _PageCartState extends State<PageCart> {
       ),
       body: _body(),
       bottomSheet: InkWell(
-        onTap: null,
+        onTap: (() {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PageTakeOrder(
+                bar: widget.bar,
+                cartContent: widget.cartContent,
+                arrivingIn: _selectedArrivingIn,
+                paymentMethod: _selectedPaymentMethod,
+              ),
+            ),
+          );
+        }),
         child: Container(
           width: _screenWidth,
           color: Colors.deepOrange,
@@ -102,12 +124,36 @@ class _PageCartState extends State<PageCart> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
-            Image.asset("assets/cb.png"),
-            Image.asset("assets/paypal.png"),
-            Image.asset("assets/money.png"),
+            _paymentMethodItem(PaymentMethod.cb, "assets/cb.png"),
+            _paymentMethodItem(PaymentMethod.payPal, "assets/paypal.png"),
+            _paymentMethodItem(PaymentMethod.cash, "assets/money.png"),
           ],
         ),
       ],
+    );
+  }
+
+  Widget    _paymentMethodItem(PaymentMethod paymentMethod, String imagePath) {
+    return GestureDetector(
+      onTap: (() {
+        setState(() {
+          _selectedPaymentMethod = paymentMethod ;
+        });
+      }),
+      child: Container(
+        decoration: (_selectedPaymentMethod == paymentMethod) ? BoxDecoration(
+          border: Border.all(
+            width: 2,
+            color: Colors.deepOrange,
+            style: BorderStyle.solid,
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ) : null,
+        child: Padding(
+          padding: EdgeInsets.all(5),
+          child: Image.asset(imagePath),
+        ),
+      ),
     );
   }
 
@@ -185,8 +231,6 @@ class _PageCartState extends State<PageCart> {
   }
 
   Widget    _userPosition() {
-
-    // TODO : Display items if the user clicks on something
     return Padding(
       padding: EdgeInsets.only(left: 30, right: 30),
       child: Column(
@@ -197,6 +241,7 @@ class _PageCartState extends State<PageCart> {
                 _currentUserPosition = UserPosition.onTheSpot ;
                 _showTimeList = false ;
                 _arrivingInText = DEFAULT_ARRIVING_IN_TEXT ;
+                _selectedArrivingIn = 0 ;
               });
             }),
             child: Row(
@@ -264,6 +309,7 @@ class _PageCartState extends State<PageCart> {
                   setState(() {
                     _arrivingInText = "J'arrive dans $newValue minutes";
                     _showTimeList = false ;
+                    _selectedArrivingIn = newValue ;
                   });
                 }),
                 items: _arrivingInList.map((int value) {

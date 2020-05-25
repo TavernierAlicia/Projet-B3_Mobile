@@ -4,6 +4,7 @@ import 'package:latlong/latlong.dart';
 import 'package:projet_b3/model/bar.dart';
 import 'package:projet_b3/model/filter.dart';
 import 'package:projet_b3/pages/page_bar.dart';
+import 'package:projet_b3/requests/bar_requests.dart';
 import 'package:projet_b3/views/filter_item.dart';
 
 class PageBars extends StatefulWidget {
@@ -18,12 +19,7 @@ class _PageBarsState extends State<PageBars> {
   final         _searchBarController = TextEditingController() ;
 
   // TODO : Test purposes only ; replace with a Future that retrieve bars.
-  List         _barsList = [
-    Bar("TestName0", "TestDescription0", 4, "", LatLng(48.8557579, 2.3753418)),
-    Bar("TestName1", "TestDescription1", 4, "", LatLng(43.8557579, 2.3753418)),
-    Bar("TestName2", "TestDescription2", 4, "", LatLng(48.8557579, 3.3753418)),
-    Bar("TestName3", "TestDescription3", 4, "", LatLng(49.8557579, 3.3753418)),
-  ];
+  Future<List<Bar>>   _barsList ;
 
   List         _barTypes = [
     Filter('Tous', true),
@@ -59,32 +55,52 @@ class _PageBarsState extends State<PageBars> {
   double        _mapZoom = 5.0 ;
 
   @override
+  void initState() {
+    print("In initState");
+    _barsList = getBarsList();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
 
-    _markers = _markersGenerator() ;
+    _barsList.then((value) => _markers = _markersGenerator(value));
 
     return Scaffold(
-        body: Stack(
-            children: <Widget>[
-              Flex(
-                direction: Axis.vertical,
-                children: <Widget>[
-                  _displayMap()
-                ],
-              ),
-              _searchBar(),
-              Positioned(
-                top: 110,
-                left: 20,
-                child: _setFilters(),
-              ),
-              Positioned(
-                bottom: 10,
-                right: 10,
-                child: _centerMap(),
-              ),
-            ]
-        )
+      body: FutureBuilder(
+        future: _barsList,
+        builder: (context, snapshot) {
+          return (snapshot.data != null) ?
+          Stack(
+              children: <Widget>[
+                Flex(
+                  direction: Axis.vertical,
+                  children: <Widget>[
+                    _displayMap()
+                  ],
+                ),
+                _searchBar(),
+                Positioned(
+                  top: 110,
+                  left: 20,
+                  child: _setFilters(),
+                ),
+                Positioned(
+                  bottom: 10,
+                  right: 10,
+                  child: _centerMap(),
+                ),
+              ]
+          )
+              : Center(
+            child: SizedBox(
+              width: 75,
+              height: 75,
+              child: CircularProgressIndicator(),
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -295,16 +311,14 @@ class _PageBarsState extends State<PageBars> {
   }
 
   /// Builds a list of Marker objects, given the bars list.
-  /// TODO : This function should be a Future, as it will get a list of bars
-  /// TODO :    given the users position.
-  List<Marker>    _markersGenerator() {
+  List<Marker>    _markersGenerator(List<Bar> barsList) {
     List<Marker> result = [];
 
-    _barsList.forEach((bar) {
+    barsList.forEach((element) {
       result.add(Marker(
         width: 50,
         height: 50,
-        point: LatLng(bar.coordinates.latitude, bar.coordinates.longitude),
+        point: LatLng(element.coordinates.latitude, element.coordinates.longitude),
         builder: (context) => Container(
           child: GestureDetector(
             child: Image.asset(
@@ -312,11 +326,11 @@ class _PageBarsState extends State<PageBars> {
               scale: 1.50,
             ),
             onTap: (() {
-              print("Clicked on ${bar.name}");
-              _showBarPreview(bar);
+              print("Clicked on ${element.name}");
+              _showBarPreview(element);
               setState(() {
                 // FIXME : Does not seems to work...
-                _mapCenter = bar.coordinates ;
+                _mapCenter = element.coordinates ;
                 _mapZoom = 10 ;
               });
             }),
@@ -324,65 +338,88 @@ class _PageBarsState extends State<PageBars> {
         ),
       ));
     });
-
     return result ;
   }
 
   void          _showBarPreview(Bar bar) {
     showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          content: Wrap(
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Image.network(bar.imageUrl),
-                  Column(
-                    children: <Widget>[
-                      Text(bar.name),
-                      // TODO : Category
-                      // TODO : Open hours
-                    ],
-                  )
-                ],
-              ),
-              GestureDetector(
-                onTap: (() {
-                  print("Clicked !");
-                  Navigator.of(context).pop();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => PageBar(bar: bar),
+        context: context,
+        builder: (dialogContext) {
+          return AlertDialog(
+            content: Wrap(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 75,
+                      height: 75,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          image: NetworkImage(
+                            bar.imageUrl,
+                          ),
+                          fit: BoxFit.fill
+                        )
+                      ),
                     ),
-                  );
-                }),
-                child: Container(
-                  width: double.maxFinite,
-                  decoration: BoxDecoration(
-                    color: Colors.deepOrange,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(30),
-                    )
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Text(
-                      "Acceder a la carte",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold
+                    Padding(padding: EdgeInsets.all(10),),
+                    Flexible(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            bar.name,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 3,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold
+                            ),
+                          ),
+                          Text("Bar a ${bar.subtype}"),
+                          Text("Ouvert jusqu'a 23h59"),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Padding(padding: EdgeInsets.all(10),),
+                InkWell(
+                  onTap: (() {
+                    print("Clicked !");
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => PageBar(bar: bar),
+                      ),
+                    );
+                  }),
+                  child: Container(
+                    width: double.maxFinite,
+                    decoration: BoxDecoration(
+                        color: Colors.deepOrange,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(30),
+                        )
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(17),
+                      child: Text(
+                        "Acceder a la carte",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        );
-      }
+              ],
+            ),
+          );
+        }
     );
   }
 
