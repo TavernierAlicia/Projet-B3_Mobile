@@ -104,7 +104,7 @@ class _PageBarState extends State<PageBar> {
                     // TODO : Add bar to favorites
                   }),
                   child: Image.asset(
-                    "assets/favorites.png",
+                    "assets/favorite_empty.png",
                     scale: 1.5,
                   ),
                 ),
@@ -235,7 +235,7 @@ class _PageBarState extends State<PageBar> {
           ],
         ),
 
-        Image.asset("assets/favorites.png"),
+        Image.asset("assets/favorite_empty.png"),
         Padding(padding: EdgeInsets.all(20),),
         Center(
           child: Text(

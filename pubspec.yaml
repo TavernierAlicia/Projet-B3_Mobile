@@ -51,7 +51,8 @@ flutter:
     - assets/cb.png
     - assets/circle.png
     - assets/facebook.png
-    - assets/favorites.png
+    - assets/favorite_empty.png
+    - assets/favorite_full.png
     - assets/filters.png
     - assets/google.png
     - assets/home.png

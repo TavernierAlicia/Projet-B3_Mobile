@@ -36,7 +36,7 @@ class _MainPageState extends State<MainPage> {
       items: [
         _bottomNavigationBarItem('assets/home.png', "Bars"),
         _bottomNavigationBarItem('assets/orders.png', "Commandes"),
-        _bottomNavigationBarItem('assets/favorites.png', "Favoris"),
+        _bottomNavigationBarItem('assets/favorite_empty.png', "Favoris"),
         _bottomNavigationBarItem('assets/settings.png', "Parametres"),
       ],
       onTap: ((index) { _switchPage(index); }),
