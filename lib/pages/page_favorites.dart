@@ -58,9 +58,13 @@ class _PageFavoritesState extends State<PageFavorites> {
 
   Widget    _favorites() {
 
-    _favoritesList.forEach((element) {
-      print("Favorites list ; ELEMENT = ${element.id}");
-    });
+    if (_favoritesList.length == 0) {
+      return Center(
+        child: Text(
+          "Aucun favori pour l'instant !"
+        ),
+      );
+    }
     return ListView.builder(
       shrinkWrap: true,
       itemCount: _favoritesList.length,
@@ -75,19 +79,14 @@ class _PageFavoritesState extends State<PageFavorites> {
   }
 
   void    _removeFromFavorites(int toRemoveIndex) {
-    print("In _removeFromFavorites ; SHOULD REMOVE $toRemoveIndex");
-    Scaffold.of(context).showSnackBar(
-      SnackBar(content: Text("OK"),)
-    );
-    _favoritesList.forEach((element) {
-      print("BEFORE DELETE ; ELEMENT = ${element.date}");
+
+    removeFromFavorites(_favoritesList[toRemoveIndex].id).then((value) {
+      setState(() {
+        _favoritesList.removeAt(toRemoveIndex);
+      });
+      Scaffold.of(context).showSnackBar(
+          SnackBar(content: Text("OK"),)
+      );
     });
-    setState(() {
-      _favoritesList.removeAt(toRemoveIndex);
-    });
-    _favoritesList.forEach((element) {
-      print("AFTER DELETE ; ELEMENT = ${element.date}");
-    });
-    // TODO : Call server to remove fav
   }
 }

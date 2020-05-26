@@ -90,9 +90,14 @@ Widget    favoriteItem(context, Favorite favorite, {
                       children: <Widget>[
                         Image.asset(
                           "assets/favorite_full.png",
-                          width: 35,
+                          scale: 2,
                         ),
-                        Text(favorite.nbFav.toString()),
+                        Text(
+                          favorite.nbFav.toString(),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold
+                          ),
+                        ),
                       ],
                     ),
                   ),

@@ -178,12 +178,12 @@ class _PageBarState extends State<PageBar> {
   void    _favClicked(BarInfo barInfo) {
 
     if (barInfo.barDetails.isFavorite) {
-      removeFromFavorites(barInfo).then((value) {
+      removeFromFavorites(barInfo.barDetails.id).then((value) {
         if (value == "deleted")
           _updateFavoritesUI() ;
       });
     } else {
-      addToFavorites(barInfo).then((value) {
+      addToFavorites(barInfo.barDetails.id).then((value) {
         if (value == "Added!")
           _updateFavoritesUI() ;
       });

@@ -17,8 +17,8 @@ Future<List<Favorite>>    getFavorites() async {
   return favorites ;
 }
 
-Future<String>        addToFavorites(BarInfo barInfo) async {
-  String    url = BASE_URL + "favs/add/" + barInfo.barDetails.id.toString() ;
+Future<String>        addToFavorites(int toAddId) async {
+  String    url = BASE_URL + "favs/add/" + toAddId.toString() ;
   Map<String, String> headers = {
     "Authorization" : "dcdb199e-2797-4041-8b26-08bc451dd47b"
   } ;
@@ -28,8 +28,8 @@ Future<String>        addToFavorites(BarInfo barInfo) async {
   return jsonDecode(response.body) ;
 }
 
-Future<String>        removeFromFavorites(BarInfo barInfo) async {
-  String url = BASE_URL + "favs/delete/" + barInfo.barDetails.id.toString() ;
+Future<String>        removeFromFavorites(int toRemoveId) async {
+  String url = BASE_URL + "favs/delete/" + toRemoveId.toString() ;
   print("URL = $url");
   Map<String, String> headers = {
     "Authorization" : "dcdb199e-2797-4041-8b26-08bc451dd47b"
