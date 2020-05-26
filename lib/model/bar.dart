@@ -1,5 +1,6 @@
-import 'package:latlong/latlong.dart';
 import 'dart:convert';
+
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Bar {
 

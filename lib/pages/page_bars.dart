@@ -1,11 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong/latlong.dart';
+import 'package:geolocator/geolocator.dart';
+//import 'package:flutter_map/flutter_map.dart';
+//import 'package:latlong/latlong.dart';
 import 'package:projet_b3/model/bar.dart';
 import 'package:projet_b3/model/filter.dart';
 import 'package:projet_b3/pages/page_bar.dart';
 import 'package:projet_b3/requests/bar_requests.dart';
 import 'package:projet_b3/views/filter_item.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class PageBars extends StatefulWidget {
   PageBars({Key key}) : super(key: key);
@@ -16,9 +21,17 @@ class PageBars extends StatefulWidget {
 
 class _PageBarsState extends State<PageBars> {
 
-  final         _searchBarController = TextEditingController() ;
+  final                         _searchBarController = TextEditingController() ;
 
-  // TODO : Test purposes only ; replace with a Future that retrieve bars.
+  Permission                      _accessPosition = Permission.locationAlways ;
+
+  /// Map variables
+  GoogleMapController             _mapController ;
+  Geolocator                      _geolocator = Geolocator();
+  Future<Position>                _userLocationFuture ;
+  Position                        _userLocation ;
+  List<Marker>                    _markers = [] ;
+
   Future<List<Bar>>   _barsList ;
 
   List         _barTypes = [
@@ -49,36 +62,100 @@ class _PageBarsState extends State<PageBars> {
   List<Filter>  _filtersSelectedPopularity = [] ;
   List<Filter>  _filtersSelectedDistance = [] ;
 
-  List<Marker>  _markers = [];
-
-  LatLng        _mapCenter = LatLng(51.5, -0.09) ;
-  double        _mapZoom = 5.0 ;
+  Size          _screenSize ;
 
   @override
   void initState() {
     print("In initState");
     _barsList = getBarsList();
+    _accessPosition.isGranted.then((value) {
+      print("Permission = $value");
+      if (!value) {
+        _getPermissions();
+      } else {
+        _getLocation();
+      }
+    });
     super.initState();
+  }
+
+  void    _getPermissions() async {
+    await Permission.locationAlways.request().then((value) {
+      print("PERMISSION RESPONSE = $value");
+      if (value == PermissionStatus.granted) {
+        _getLocation();
+      }
+      // TODO : Handle no+
+      /*_location.onLocationChanged().listen((value) {
+        setState(() {
+          print("NEW LOCATION = $value");
+          _userLocation = value ;
+        });
+      });*/
+    }) ;
+  }
+
+  void                _getLocation() {
+    /*
+    _waitForLocation().then((value) {
+      setState(() {
+        /// When userLocation is retrieved, we set _userLocation and animate the
+        /// map with a zoom on the new coords.
+        print("GOT USER COORDS ; ANIMATING CAMERA");
+        _userLocation = value ;
+        _mapController.animateCamera(
+          CameraUpdate.newLatLngZoom(
+            LatLng(value.latitude, value.longitude),
+            10,
+          ),
+        );
+      });
+    });*/
+    _geolocator.getPositionStream(
+      LocationOptions(
+        accuracy: LocationAccuracy.best,
+        timeInterval: 1000,
+      ),
+    ).listen((event) {
+      setState(() {
+        // TODO : This might cause memory leaks
+        print("New location : $event");
+        _userLocation = event ;
+      });
+    });
+  }
+
+  Future<Position>    _waitForLocation() async {
+    var currentLocation ;
+    try {
+      currentLocation = await _geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.best,
+      );
+    } catch (e) {
+      print("CATCHING ERROR : ${e}");
+      currentLocation = null ;
+    }
+    _userLocation = currentLocation ;
+    return currentLocation ;
   }
 
   @override
   Widget build(BuildContext context) {
 
-    _barsList.then((value) => _markers = _markersGenerator(value));
+    _screenSize = MediaQuery.of(context).size ;
+
+    _barsList.then((value) {
+      _markers = _markersGenerator(value) ;
+    });
 
     return Scaffold(
       body: FutureBuilder(
-        future: _barsList,
+        future: _waitForLocation(),
         builder: (context, snapshot) {
           return (snapshot.data != null) ?
           Stack(
               children: <Widget>[
-                Flex(
-                  direction: Axis.vertical,
-                  children: <Widget>[
-                    _displayMap()
-                  ],
-                ),
+                _displayMap(),
                 _searchBar(),
                 Positioned(
                   top: 110,
@@ -232,8 +309,12 @@ class _PageBarsState extends State<PageBars> {
   Widget          _centerMap() {
     return GestureDetector(
       onTap: (() {
-        print("Should recenter map");
-        // TODO
+        _mapController.animateCamera(
+          CameraUpdate.newLatLngZoom(
+            LatLng(_userLocation.latitude, _userLocation.longitude),
+            10,
+          ),
+        );
       }),
       child: Image.asset("assets/recenter.png"),
     );
@@ -280,21 +361,35 @@ class _PageBarsState extends State<PageBars> {
   /// Handles the map display.
   /// We are using Open Street Map, as this is a free to use API.
   Widget          _displayMap() {
-    return Flexible(
-      child: FlutterMap(
-        options: MapOptions(
-          center: _mapCenter,
-          zoom: _mapZoom,
-        ),
-        layers: [
-          TileLayerOptions(
-            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            subdomains: ['a', 'b', 'c'],
-            tileProvider: NonCachingNetworkTileProvider(),
+    return Wrap(
+      children: <Widget>[
+        Container(
+          width: _screenSize.width,
+          height: _screenSize.height - 80 ,
+          child: GoogleMap(
+            mapType: MapType.terrain,
+            onMapCreated: (GoogleMapController controller) {
+              print("Map is created");
+              setState(() {
+                print("in setState");
+                _mapController = controller ;
+                _mapController.animateCamera(
+                  CameraUpdate.newLatLngZoom(
+                    LatLng(_userLocation.latitude, _userLocation.longitude),
+                    10,
+                  ),
+                );
+              });
+            },
+            initialCameraPosition: CameraPosition(
+              target: LatLng(_userLocation.latitude, _userLocation.longitude),
+            ),
+            markers: Set<Marker>.of(_markers),
+            zoomControlsEnabled: false,
+            myLocationEnabled: true,
           ),
-          MarkerLayerOptions(markers: _markers)
-        ],
-      ),
+        )
+      ],
     );
   }
 
@@ -311,7 +406,38 @@ class _PageBarsState extends State<PageBars> {
   }
 
   /// Builds a list of Marker objects, given the bars list.
-  List<Marker>    _markersGenerator(List<Bar> barsList) {
+  List<Marker>   _markersGenerator(List<Bar> barsList) {
+
+    List<Marker> result = [] ;
+    var markerImage ;
+
+    BitmapDescriptor.fromAssetImage(
+      ImageConfiguration.empty,
+      "assets/location_pin.png",
+    ).then((value) => markerImage = value );
+
+    barsList.forEach((element) {
+      result.add(
+        Marker(
+            markerId: MarkerId(UniqueKey().toString()),
+            position: element.coordinates,
+            icon: markerImage,
+            onTap: (() {
+              print("Clicked on ${element.name}");
+              _mapController.animateCamera(
+                CameraUpdate.newLatLng(
+                  element.coordinates,
+                ),
+              );
+              _showBarPreview(element);
+            })
+        ),
+      );
+    });
+    return result ;
+  }
+
+/*  List<Marker>    _markersGenerator(List<Bar> barsList) {
     List<Marker> result = [];
 
     barsList.forEach((element) {
@@ -339,7 +465,7 @@ class _PageBarsState extends State<PageBars> {
       ));
     });
     return result ;
-  }
+  } */
 
   void          _showBarPreview(Bar bar) {
     showDialog(
@@ -354,13 +480,13 @@ class _PageBarsState extends State<PageBars> {
                       width: 75,
                       height: 75,
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          image: NetworkImage(
-                            bar.imageUrl,
-                          ),
-                          fit: BoxFit.fill
-                        )
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                              image: NetworkImage(
+                                bar.imageUrl,
+                              ),
+                              fit: BoxFit.fill
+                          )
                       ),
                     ),
                     Padding(padding: EdgeInsets.all(10),),
@@ -373,7 +499,7 @@ class _PageBarsState extends State<PageBars> {
                             overflow: TextOverflow.ellipsis,
                             maxLines: 3,
                             style: TextStyle(
-                              fontWeight: FontWeight.bold
+                                fontWeight: FontWeight.bold
                             ),
                           ),
                           Text("Bar a ${bar.subtype}"),
