@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 //import 'package:flutter_map/flutter_map.dart';
 //import 'package:latlong/latlong.dart';
 import 'package:projet_b3/model/bar.dart';
@@ -7,6 +10,7 @@ import 'package:projet_b3/pages/page_bar.dart';
 import 'package:projet_b3/requests/bar_requests.dart';
 import 'package:projet_b3/views/filter_item.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class PageBars extends StatefulWidget {
   PageBars({Key key}) : super(key: key);
@@ -17,9 +21,15 @@ class PageBars extends StatefulWidget {
 
 class _PageBarsState extends State<PageBars> {
 
-  final         _searchBarController = TextEditingController() ;
+  final                         _searchBarController = TextEditingController() ;
 
-  // TODO : Test purposes only ; replace with a Future that retrieve bars.
+  Permission                      _accessPosition = Permission.locationAlways ;
+
+  /// Map variables
+  Completer<GoogleMapController>  _controller = Completer();
+  Geolocator                      _geolocator = Geolocator();
+  Position                        _userLocation ;
+
   Future<List<Bar>>   _barsList ;
 
   List         _barTypes = [
@@ -50,17 +60,64 @@ class _PageBarsState extends State<PageBars> {
   List<Filter>  _filtersSelectedPopularity = [] ;
   List<Filter>  _filtersSelectedDistance = [] ;
 
-  double        _mapZoom = 5.0 ;
+  Size          _screenSize ;
 
   @override
   void initState() {
     print("In initState");
     _barsList = getBarsList();
+    _accessPosition.isGranted.then((value) {
+      print("Permission = $value");
+      if (!value) {
+        _getPermissions();
+      } else {
+        _getLocation().then((value) {
+          setState(() {
+            print("Getting userLocation : ${value}");
+            _userLocation = value ;
+          });
+        });
+        // TODO : Listen for location updates
+      }
+    });
     super.initState();
+  }
+
+  void    _getPermissions() async {
+    await Permission.locationAlways.request().then((value) {
+      print("PERMISSION RESPONSE = $value");
+      _getLocation().then((value) {
+        setState(() {
+          _userLocation = value ;
+        });
+      });
+      /*_location.onLocationChanged().listen((value) {
+        setState(() {
+          print("NEW LOCATION = $value");
+          _userLocation = value ;
+        });
+      });*/
+    }) ;
+  }
+
+  Future<Position>    _getLocation() async {
+    print("IN GET LOCATION");
+    var currentLocation ;
+    try {
+      currentLocation = await _geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.best,
+      );
+    } catch (e) {
+      print("CATCHING ERROR : ${e}");
+      currentLocation = null ;
+    }
+    return currentLocation ;
   }
 
   @override
   Widget build(BuildContext context) {
+
+    _screenSize = MediaQuery.of(context).size ;
 
     _barsList.then((value) {
 
@@ -73,12 +130,7 @@ class _PageBarsState extends State<PageBars> {
           return (snapshot.data != null) ?
           Stack(
               children: <Widget>[
-                Flex(
-                  direction: Axis.vertical,
-                  children: <Widget>[
-                    _displayMap()
-                  ],
-                ),
+                _displayMap(),
                 _searchBar(),
                 Positioned(
                   top: 110,
@@ -280,10 +332,25 @@ class _PageBarsState extends State<PageBars> {
   /// Handles the map display.
   /// We are using Open Street Map, as this is a free to use API.
   Widget          _displayMap() {
-    return Flexible(
-      child: GoogleMap(
-        
-      )
+    return Wrap(
+      children: <Widget>[
+        Container(
+            width: _screenSize.width,
+            height: _screenSize.height - 80 ,
+            child: GoogleMap(
+              mapType: MapType.terrain,
+              onMapCreated: (GoogleMapController controller) {
+                print("Map is created");
+                setState(() {
+                  _controller.complete(controller);
+                });
+              },
+              initialCameraPosition: CameraPosition(
+                target: LatLng(37.4219999, -122.0862462),
+              ),
+            )
+        )
+      ],
     );
   }
 
@@ -343,13 +410,13 @@ class _PageBarsState extends State<PageBars> {
                       width: 75,
                       height: 75,
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          image: NetworkImage(
-                            bar.imageUrl,
-                          ),
-                          fit: BoxFit.fill
-                        )
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                              image: NetworkImage(
+                                bar.imageUrl,
+                              ),
+                              fit: BoxFit.fill
+                          )
                       ),
                     ),
                     Padding(padding: EdgeInsets.all(10),),
@@ -362,7 +429,7 @@ class _PageBarsState extends State<PageBars> {
                             overflow: TextOverflow.ellipsis,
                             maxLines: 3,
                             style: TextStyle(
-                              fontWeight: FontWeight.bold
+                                fontWeight: FontWeight.bold
                             ),
                           ),
                           Text("Bar a ${bar.subtype}"),
