@@ -85,7 +85,7 @@ class _PageFavoritesState extends State<PageFavorites> {
         _favoritesList.removeAt(toRemoveIndex);
       });
       Scaffold.of(context).showSnackBar(
-          SnackBar(content: Text("OK"),)
+          SnackBar(content: Text("Le bar a été supprimé de votre liste de favoris."),)
       );
     });
   }
