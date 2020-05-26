@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:projet_b3/requests/account_requests.dart';
 
 class PageRegister extends StatefulWidget {
   PageRegister({Key key}) : super(key: key);
@@ -12,6 +13,7 @@ class _PageRegisterState extends State<PageRegister> {
   final   _formKey = GlobalKey<FormState>() ;
   double  _screenWidth = 0 ;
 
+  final   TextEditingController   _firstNameController = TextEditingController();
   final   TextEditingController   _nameController = TextEditingController();
   final   TextEditingController   _emailController = TextEditingController();
   final   TextEditingController   _birthDayController = TextEditingController();
@@ -45,8 +47,14 @@ class _PageRegisterState extends State<PageRegister> {
                 child: Column(
                   children: <Widget>[
                     _formItem(
-                      "Nom prenom",
-                      "Entrez votre nom et prenom",
+                      "Prenom",
+                      "Entrez votre prenom",
+                      _basicValidator,
+                      _firstNameController,
+                    ),
+                    _formItem(
+                      "Nom",
+                      "Entrez votre nom",
                       _basicValidator,
                       _nameController,
                     ),
@@ -209,7 +217,15 @@ class _PageRegisterState extends State<PageRegister> {
           }),
           onSaved: ((value) {
             print("onSaved, newValue = $value");
-            // TODO
+            createUser(
+              _firstNameController.text,
+              _nameController.text,
+              _emailController.text,
+              _passwordController.text,
+              _confPassController.text,
+              _birthDayController.text,
+              _phoneController.text,
+            );
           }),
         ),
       ],
