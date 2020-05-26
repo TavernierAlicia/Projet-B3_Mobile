@@ -55,17 +55,20 @@ flutter:
     - assets/favorite_full.png
     - assets/filters.png
     - assets/google.png
-    - assets/home.png
+    - assets/home_empty.png
+    - assets/home_full.png
     - assets/instagram.png
     - assets/location_pin.png
     - assets/logging_in.gif
     - assets/money.png
-    - assets/orders.png
+    - assets/orders_full.png
+    - assets/orders_empty.png
     - assets/paypal.png
     - assets/recenter.png
     - assets/remove.png
     - assets/search.png
-    - assets/settings.png
+    - assets/settings_empty.png
+    - assets/settings_full.png
     - assets/trash.png
     - assets/valid.png
   #  - images/a_dot_burr.jpeg

@@ -13,8 +13,9 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
 
-  int   _selectedPageIndex = 0 ;
-  final _pagesList = [
+  int     _selectedPageIndex = 0 ;
+  double  _screenWidth = 0 ;
+  final   _pagesList = [
     PageBars(),
     PageOrders(),
     PageFavorites(),
@@ -23,6 +24,10 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    _screenWidth = MediaQuery.of(context).size.width ;
+    print("SCREEN WIDTH = $_screenWidth");
+
     return Scaffold(
       body: _pagesList[_selectedPageIndex],
       bottomNavigationBar: _bottomNavigationBar(),
@@ -34,21 +39,45 @@ class _MainPageState extends State<MainPage> {
     return BottomNavigationBar(
       currentIndex: _selectedPageIndex,
       items: [
-        _bottomNavigationBarItem('assets/home.png', "Bars"),
-        _bottomNavigationBarItem('assets/orders.png', "Commandes"),
-        _bottomNavigationBarItem('assets/favorite_empty.png', "Favoris"),
-        _bottomNavigationBarItem('assets/settings.png', "Parametres"),
+        _bottomNavigationBarItem('assets/home_empty.png', 'assets/home_full.png', "Bars"),
+        _bottomNavigationBarItem('assets/orders_empty.png', 'assets/orders_full.png', "Commandes"),
+        _bottomNavigationBarItem('assets/favorite_empty.png', 'assets/favorite_full.png', "Favoris"),
+        _bottomNavigationBarItem('assets/settings_empty.png', 'assets/settings_full.png', "Parametres"),
       ],
       onTap: ((index) { _switchPage(index); }),
     );
   }
 
   /// Generate a BottomNavigationBarItem, given an IconData and a String.
-  BottomNavigationBarItem _bottomNavigationBarItem(String imagePath, String title) {
+  BottomNavigationBarItem _bottomNavigationBarItem(String iconPath,
+      String activeIconPath, String title) {
     return BottomNavigationBarItem(
-      icon: Image.asset(
-        imagePath,
-        scale: 1.1,
+      activeIcon: Padding(
+        padding: EdgeInsets.only(top: 10),
+        child: Container(
+          width: _screenWidth / 12,
+          height: _screenWidth / 12,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              fit: BoxFit.contain,
+              image: Image.asset(
+                activeIconPath,
+              ).image,
+            ),
+          ),
+        ),
+      ),
+      icon: Container(
+        width: _screenWidth / 15,
+        height: _screenWidth / 15,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            fit: BoxFit.contain,
+            image: Image.asset(
+              iconPath,
+            ).image,
+          ),
+        ),
       ),
       title: Text(""),
     );
