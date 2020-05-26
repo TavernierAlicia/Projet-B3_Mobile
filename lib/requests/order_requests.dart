@@ -12,7 +12,7 @@ Future<String>  takeOrder(Bar bar, List<Product> cartContent, int arrivingIn,
     PaymentMethod paymentMethod) async {
   String                url = BASE_URL + "takeOrder" ;
   Map<String, String>   headers = {
-    "Authorization" : "dcdb199e-2797-4041-8b26-08bc451dd47b"
+    "Authorization" : "6d60e931-856c-4927-bca2-344be1cfe135"
   } ;
 
   List<int> products = [] ;
@@ -47,7 +47,7 @@ Future<String>  takeOrder(Bar bar, List<Product> cartContent, int arrivingIn,
 Future<List<Order>>     getOrdersHistory() async {
   String        url = BASE_URL + "showOrders" ;
   Map<String, String>   headers = {
-    "Authorization" : "dcdb199e-2797-4041-8b26-08bc451dd47b"
+    "Authorization" : "6d60e931-856c-4927-bca2-344be1cfe135"
   } ;
 
   Response    response = await get(url, headers: headers) ;

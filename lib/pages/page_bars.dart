@@ -8,6 +8,7 @@ import 'package:projet_b3/model/bar.dart';
 import 'package:projet_b3/model/filter.dart';
 import 'package:projet_b3/pages/page_bar.dart';
 import 'package:projet_b3/requests/bar_requests.dart';
+import 'package:projet_b3/views/bar_item.dart';
 import 'package:projet_b3/views/filter_item.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -21,18 +22,15 @@ class PageBars extends StatefulWidget {
 
 class _PageBarsState extends State<PageBars> {
 
-  final                         _searchBarController = TextEditingController() ;
-
   Permission                      _accessPosition = Permission.locationAlways ;
 
   /// Map variables
   GoogleMapController             _mapController ;
-  Geolocator                      _geolocator = Geolocator();
-  Future<Position>                _userLocationFuture ;
+  Geolocator                      _geoLocator = Geolocator();
   Position                        _userLocation ;
   List<Marker>                    _markers = [] ;
 
-  Future<List<Bar>>   _barsList ;
+  Future<List<Bar>>               _barsList ;
 
   List         _barTypes = [
     Filter('Tous', true),
@@ -56,6 +54,11 @@ class _PageBarsState extends State<PageBars> {
     Filter("Proches", true),
     Filter("Tous", false),
   ];
+
+  /// Text search variables
+  final               _searchBarController = TextEditingController() ;
+  Future<List<Bar>>   _searchResultsFuture ;
+  bool                _isSearchEnabled = false ;
 
   // TODO : No need to create a list
   List<Filter>  _filtersSelectedType = [] ;
@@ -86,53 +89,34 @@ class _PageBarsState extends State<PageBars> {
         _getLocation();
       }
       // TODO : Handle no+
-      /*_location.onLocationChanged().listen((value) {
-        setState(() {
-          print("NEW LOCATION = $value");
-          _userLocation = value ;
-        });
-      });*/
     }) ;
   }
 
   void                _getLocation() {
-    /*
-    _waitForLocation().then((value) {
-      setState(() {
-        /// When userLocation is retrieved, we set _userLocation and animate the
-        /// map with a zoom on the new coords.
-        print("GOT USER COORDS ; ANIMATING CAMERA");
-        _userLocation = value ;
-        _mapController.animateCamera(
-          CameraUpdate.newLatLngZoom(
-            LatLng(value.latitude, value.longitude),
-            10,
-          ),
-        );
-      });
-    });*/
-    _geolocator.getPositionStream(
+    _geoLocator.getPositionStream(
       LocationOptions(
         accuracy: LocationAccuracy.best,
         timeInterval: 1000,
       ),
     ).listen((event) {
+      // TODO : Uncomment following when not in debug
+      /*
       setState(() {
         // TODO : This might cause memory leaks
         print("New location : $event");
         _userLocation = event ;
-      });
+      });*/
     });
   }
 
   Future<Position>    _waitForLocation() async {
     var currentLocation ;
     try {
-      currentLocation = await _geolocator.getCurrentPosition(
+      currentLocation = await _geoLocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.best,
       );
     } catch (e) {
-      print("CATCHING ERROR : ${e}");
+      print("CATCHING ERROR : $e");
       currentLocation = null ;
     }
     _userLocation = currentLocation ;
@@ -162,6 +146,20 @@ class _PageBarsState extends State<PageBars> {
                   left: 20,
                   child: _setFilters(),
                 ),
+                /*(_isSearchEnabled)
+                    ? Positioned(
+                  bottom: 5,
+                  left: 5,
+                  right: 5,
+                  child: _displaySearchResults(),
+                )
+                    : Wrap(
+                  children: <Widget>[
+                    Container(
+                      color: Colors.green,
+                    )
+                  ],
+                ),*/
                 Positioned(
                   bottom: 10,
                   right: 10,
@@ -178,6 +176,7 @@ class _PageBarsState extends State<PageBars> {
           );
         },
       ),
+      bottomSheet: (_isSearchEnabled) ? _displaySearchResults() : null,
     );
   }
 
@@ -397,12 +396,76 @@ class _PageBarsState extends State<PageBars> {
   /// button.
   void            _performSearch() {
     print("Should perform search about ${_searchBarController.text}");
-    Scaffold.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Feature not implemented yet."),
-        )
+    String search = _searchBarController.text ;
+
+    if (search.isNotEmpty)
+      setState(() {
+        _searchResultsFuture = searchBars(search);
+        _isSearchEnabled = true ;
+      });
+  }
+
+  Widget          _displaySearchResults() {
+
+    return FutureBuilder(
+      future: _searchResultsFuture,
+      builder: ((searchContext, snapshot) {
+
+        int index = 0;
+
+        print("Building searchResults");
+        if (snapshot.hasData) {
+          return SizedBox(
+            height: 150, // card height
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: (snapshot.data as List<Bar>).length,
+              itemBuilder: (context, index) {
+                print("ITEM = ${(snapshot.data as List<Bar>)[index].name}");
+                return  barItem(context, (snapshot.data as List<Bar>)[index]);
+              },
+            ),
+                /*Flexible(
+                  flex: 4,
+                  child: PageView.builder(
+                    itemCount: (snapshot.data as List<Bar>).length,
+                    itemBuilder: (_, i) {
+                      return barItem(context, (snapshot.data as List<Bar>)[index]);
+                    },
+                  ),
+                ),
+                Flexible(
+                  flex: 1,
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    color: Colors.green,
+                  ),
+                ),*/
+          );
+          /*
+          PageView.builder(
+              itemCount: (snapshot.data as List<Bar>).length,
+              itemBuilder: (_, i) {
+                return barItem(context, (snapshot.data as List<Bar>)[index]);
+              },
+            ),
+           */
+/*            ListView.builder(
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              itemCount: (snapshot.data as List<Bar>).length,
+              itemBuilder: (context, index) {
+                print("ITEM = ${(snapshot.data as List<Bar>)[index].name}");
+                return barItem(context, (snapshot.data as List<Bar>)[index]);
+              },
+            ),
+            */
+        } else {
+        return Container() ;
+        }
+      }),
     );
-    // TODO
   }
 
   /// Builds a list of Marker objects, given the bars list.
@@ -436,36 +499,6 @@ class _PageBarsState extends State<PageBars> {
     });
     return result ;
   }
-
-/*  List<Marker>    _markersGenerator(List<Bar> barsList) {
-    List<Marker> result = [];
-
-    barsList.forEach((element) {
-      result.add(Marker(
-        width: 50,
-        height: 50,
-        point: LatLng(element.coordinates.latitude, element.coordinates.longitude),
-        builder: (context) => Container(
-          child: GestureDetector(
-            child: Image.asset(
-              'assets/location_pin.png',
-              scale: 1.50,
-            ),
-            onTap: (() {
-              print("Clicked on ${element.name}");
-              _showBarPreview(element);
-              setState(() {
-                // FIXME : Does not seems to work...
-                _mapCenter = element.coordinates ;
-                _mapZoom = 10 ;
-              });
-            }),
-          ),
-        ),
-      ));
-    });
-    return result ;
-  } */
 
   void          _showBarPreview(Bar bar) {
     showDialog(
@@ -549,4 +582,33 @@ class _PageBarsState extends State<PageBars> {
     );
   }
 
+/*  List<Marker>    _markersGenerator(List<Bar> barsList) {
+    List<Marker> result = [];
+
+    barsList.forEach((element) {
+      result.add(Marker(
+        width: 50,
+        height: 50,
+        point: LatLng(element.coordinates.latitude, element.coordinates.longitude),
+        builder: (context) => Container(
+          child: GestureDetector(
+            child: Image.asset(
+              'assets/location_pin.png',
+              scale: 1.50,
+            ),
+            onTap: (() {
+              print("Clicked on ${element.name}");
+              _showBarPreview(element);
+              setState(() {
+                // FIXME : Does not seems to work...
+                _mapCenter = element.coordinates ;
+                _mapZoom = 10 ;
+              });
+            }),
+          ),
+        ),
+      ));
+    });
+    return result ;
+  } */
 }
