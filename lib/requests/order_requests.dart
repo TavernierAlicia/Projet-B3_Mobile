@@ -27,12 +27,14 @@ Future<String>  takeOrder(Bar bar, List<Product> cartContent, int arrivingIn,
   else arrivingInString += arrivingIn.toString() ;
 
   String                jsonBody = """
-    "etab_id":${bar.id},
-    "instructions":"",
-    "waiting_time":"00:$arrivingInString",
-    "payment":"${paymentMethod.toString()}",
-    "tip":0,
-    "items_id":$products
+    {
+      "etab_id":${bar.id},
+      "instructions":"",
+      "waiting_time":"00:$arrivingInString",
+      "payment":"${paymentMethod.toString()}",
+      "tip":0,
+      "items_id":$products
+    }
   """ ;
 
   print("JSON BODY == $jsonBody");
