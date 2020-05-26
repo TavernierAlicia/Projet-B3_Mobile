@@ -28,8 +28,9 @@ class _PageBarsState extends State<PageBars> {
   /// Map variables
   GoogleMapController             _mapController ;
   Geolocator                      _geolocator = Geolocator();
+  Future<Position>                _userLocationFuture ;
   Position                        _userLocation ;
-  List<Marker>                    _markers ;
+  List<Marker>                    _markers = [] ;
 
   Future<List<Bar>>   _barsList ;
 
@@ -95,6 +96,7 @@ class _PageBarsState extends State<PageBars> {
   }
 
   void                _getLocation() {
+    /*
     _waitForLocation().then((value) {
       setState(() {
         /// When userLocation is retrieved, we set _userLocation and animate the
@@ -108,7 +110,7 @@ class _PageBarsState extends State<PageBars> {
           ),
         );
       });
-    });
+    });*/
     _geolocator.getPositionStream(
       LocationOptions(
         accuracy: LocationAccuracy.best,
@@ -116,6 +118,7 @@ class _PageBarsState extends State<PageBars> {
       ),
     ).listen((event) {
       setState(() {
+        // TODO : This might cause memory leaks
         print("New location : $event");
         _userLocation = event ;
       });
@@ -123,7 +126,6 @@ class _PageBarsState extends State<PageBars> {
   }
 
   Future<Position>    _waitForLocation() async {
-    print("IN GET LOCATION");
     var currentLocation ;
     try {
       currentLocation = await _geolocator.getCurrentPosition(
@@ -133,6 +135,7 @@ class _PageBarsState extends State<PageBars> {
       print("CATCHING ERROR : ${e}");
       currentLocation = null ;
     }
+    _userLocation = currentLocation ;
     return currentLocation ;
   }
 
@@ -147,7 +150,7 @@ class _PageBarsState extends State<PageBars> {
 
     return Scaffold(
       body: FutureBuilder(
-        future: _barsList,
+        future: _waitForLocation(),
         builder: (context, snapshot) {
           return (snapshot.data != null) ?
           Stack(
@@ -306,8 +309,12 @@ class _PageBarsState extends State<PageBars> {
   Widget          _centerMap() {
     return GestureDetector(
       onTap: (() {
-        print("Should recenter map");
-        // TODO
+        _mapController.animateCamera(
+          CameraUpdate.newLatLngZoom(
+            LatLng(_userLocation.latitude, _userLocation.longitude),
+            10,
+          ),
+        );
       }),
       child: Image.asset("assets/recenter.png"),
     );
@@ -357,21 +364,30 @@ class _PageBarsState extends State<PageBars> {
     return Wrap(
       children: <Widget>[
         Container(
-            width: _screenSize.width,
-            height: _screenSize.height - 80 ,
-            child: GoogleMap(
-              mapType: MapType.terrain,
-              onMapCreated: (GoogleMapController controller) {
-                print("Map is created");
-                setState(() {
-                  _mapController = controller ;
-                });
-              },
-              initialCameraPosition: CameraPosition(
-                target: LatLng(_userLocation.latitude, _userLocation.longitude),
-              ),
-              markers: Set<Marker>.of(_markers),
-            )
+          width: _screenSize.width,
+          height: _screenSize.height - 80 ,
+          child: GoogleMap(
+            mapType: MapType.terrain,
+            onMapCreated: (GoogleMapController controller) {
+              print("Map is created");
+              setState(() {
+                print("in setState");
+                _mapController = controller ;
+                _mapController.animateCamera(
+                  CameraUpdate.newLatLngZoom(
+                    LatLng(_userLocation.latitude, _userLocation.longitude),
+                    10,
+                  ),
+                );
+              });
+            },
+            initialCameraPosition: CameraPosition(
+              target: LatLng(_userLocation.latitude, _userLocation.longitude),
+            ),
+            markers: Set<Marker>.of(_markers),
+            zoomControlsEnabled: false,
+            myLocationEnabled: true,
+          ),
         )
       ],
     );
@@ -403,23 +419,24 @@ class _PageBarsState extends State<PageBars> {
     barsList.forEach((element) {
       result.add(
         Marker(
-          markerId: MarkerId(UniqueKey().toString()),
-          position: element.coordinates,
-          icon: markerImage,
-          onTap: (() {
-            print("Clicked on ${element.name}");
-            _mapController.animateCamera(
-              CameraUpdate.newLatLng(
-                element.coordinates,
-              ),
-            );
-            _showBarPreview(element);
-          })
+            markerId: MarkerId(UniqueKey().toString()),
+            position: element.coordinates,
+            icon: markerImage,
+            onTap: (() {
+              print("Clicked on ${element.name}");
+              _mapController.animateCamera(
+                CameraUpdate.newLatLng(
+                  element.coordinates,
+                ),
+              );
+              _showBarPreview(element);
+            })
         ),
       );
     });
     return result ;
   }
+
 /*  List<Marker>    _markersGenerator(List<Bar> barsList) {
     List<Marker> result = [];
 
