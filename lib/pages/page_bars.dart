@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong/latlong.dart';
+//import 'package:flutter_map/flutter_map.dart';
+//import 'package:latlong/latlong.dart';
 import 'package:projet_b3/model/bar.dart';
 import 'package:projet_b3/model/filter.dart';
 import 'package:projet_b3/pages/page_bar.dart';
 import 'package:projet_b3/requests/bar_requests.dart';
 import 'package:projet_b3/views/filter_item.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class PageBars extends StatefulWidget {
   PageBars({Key key}) : super(key: key);
@@ -49,9 +50,6 @@ class _PageBarsState extends State<PageBars> {
   List<Filter>  _filtersSelectedPopularity = [] ;
   List<Filter>  _filtersSelectedDistance = [] ;
 
-  List<Marker>  _markers = [];
-
-  LatLng        _mapCenter = LatLng(51.5, -0.09) ;
   double        _mapZoom = 5.0 ;
 
   @override
@@ -64,7 +62,9 @@ class _PageBarsState extends State<PageBars> {
   @override
   Widget build(BuildContext context) {
 
-    _barsList.then((value) => _markers = _markersGenerator(value));
+    _barsList.then((value) {
+
+    });
 
     return Scaffold(
       body: FutureBuilder(
@@ -281,20 +281,9 @@ class _PageBarsState extends State<PageBars> {
   /// We are using Open Street Map, as this is a free to use API.
   Widget          _displayMap() {
     return Flexible(
-      child: FlutterMap(
-        options: MapOptions(
-          center: _mapCenter,
-          zoom: _mapZoom,
-        ),
-        layers: [
-          TileLayerOptions(
-            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            subdomains: ['a', 'b', 'c'],
-            tileProvider: NonCachingNetworkTileProvider(),
-          ),
-          MarkerLayerOptions(markers: _markers)
-        ],
-      ),
+      child: GoogleMap(
+        
+      )
     );
   }
 
@@ -311,7 +300,7 @@ class _PageBarsState extends State<PageBars> {
   }
 
   /// Builds a list of Marker objects, given the bars list.
-  List<Marker>    _markersGenerator(List<Bar> barsList) {
+/*  List<Marker>    _markersGenerator(List<Bar> barsList) {
     List<Marker> result = [];
 
     barsList.forEach((element) {
@@ -339,7 +328,7 @@ class _PageBarsState extends State<PageBars> {
       ));
     });
     return result ;
-  }
+  } */
 
   void          _showBarPreview(Bar bar) {
     showDialog(
