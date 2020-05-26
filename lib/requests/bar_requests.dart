@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:projet_b3/model/bar.dart';
+import 'package:projet_b3/model/bar_info.dart';
 import 'package:projet_b3/model/product.dart';
 import 'package:projet_b3/requests/utils.dart';
 import 'package:http/http.dart';
@@ -18,18 +19,15 @@ Future<List<Bar>>    getBarsList() async {
   return barsList ;
 }
 
-Future<List<Product>>   getBarCart(Bar bar) async {
+Future<BarInfo>   getBarInfo(Bar bar) async {
   String    url = BASE_URL + "show/${bar.id}" ;
   Map<String, String> headers = {
     "Authorization" : "dcdb199e-2797-4041-8b26-08bc451dd47b"
   } ;
 
   Response  response = await get(url, headers: headers) ;
-  var       data = (json.decode(response.body))["Items"] as List ;
-  var       productsList = data.map<Product>((json) => Product.fromJson(json)).toList();
+  var       data = (json.decode(response.body)) ;
+  var       barInfo = BarInfo.fromJson(data) ;
 
-  productsList.forEach((element) {
-    print("New element ; ${element.name}");
-  });
-  return productsList ;
+  return barInfo ;
 }

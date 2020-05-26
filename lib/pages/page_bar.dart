@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:projet_b3/model/bar.dart';
+import 'package:projet_b3/model/bar_info.dart';
 import 'package:projet_b3/model/product.dart';
 import 'package:projet_b3/pages/page_cart.dart';
 import 'package:projet_b3/requests/bar_requests.dart';
+import 'package:projet_b3/requests/favorite_requests.dart';
 import 'package:projet_b3/views/bar_header.dart';
 import 'package:projet_b3/views/product_item.dart';
 
@@ -22,20 +24,21 @@ class _PageBarState extends State<PageBar> {
   /// This is the list that the bar is selling. Static data for testing
   /// purposes.
 
-  Future<List<Product>>   _productsList ;
+  Future<BarInfo>         _barInfoFuture ;
+  BarInfo                 _barInfo ;
   List<Product>           _cartContent = [] ;
 
   @override
   void initState() {
     print("In initState ; bar = ${widget.bar.name}");
-    _productsList = getBarCart(widget.bar);
+    _barInfoFuture = getBarInfo(widget.bar);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
 
-    var _bar = widget.bar ;
+    var   _bar = widget.bar ;
 
     _screenWidth = MediaQuery.of(context).size.width ;
 
@@ -89,71 +92,111 @@ class _PageBarState extends State<PageBar> {
   /// Displays the section that handles the offers list.
   Widget _offer(Bar bar) {
     return FutureBuilder(
-        future: _productsList,
+        future: _barInfoFuture,
         builder: (context, snapshot) {
-          return (snapshot.data != null) ? Column(
-            children: <Widget>[
-              barHeader(bar, _screenWidth),
-              /*Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            Column(
+          if (snapshot.data != null) {
+            _barInfo = snapshot.data as BarInfo ;
+            return Column(
               children: <Widget>[
-                GestureDetector(
-                  onTap: (() {
-                    // TODO : Add bar to favorites
-                  }),
-                  child: Image.asset(
-                    "assets/favorites.png",
-                    scale: 1.5,
-                  ),
-                ),
-                Text("1234")
-              ],
-            )
-          ],
-        ),*/
-              Padding(padding: EdgeInsets.all(20),),
-              Center(
-                child: Text(
-                  "Menu".toUpperCase(),
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 25
-                  ),
-                ),
-              ),
-              Padding(padding: EdgeInsets.all(20)),
-              Flexible(
-                fit: FlexFit.loose,
-                child: CustomScrollView(
-                  shrinkWrap: true,
-                  slivers: <Widget>[
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-                        return productItem(
-                            context,
-                            (snapshot.data as List<Product>)[index],
-                            addToCart: (item) => _addToCart(item),
-                            removeFromCart: (item) => _removeFromCart(item)
-                        );
-                      },
-                        childCount: (snapshot.data as List<Product>).length,
+                barHeader(bar, _screenWidth),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(right: 20),
+                      child: Column(
+                        children: <Widget>[
+                          GestureDetector(
+                            onTap: (() {
+                              _favClicked(_barInfo) ;
+                            }),
+                            child: Image.asset(
+                              (_barInfo.barDetails.isFavorite)
+                                  ? "assets/favorite_full.png"
+                                  : "assets/favorite_empty.png",
+                              scale: 1.5,
+                            ),
+                          ),
+                          Text(
+                            _barInfo.barDetails.favorites.toString(),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold
+                            ),
+                          )
+                        ],
                       ),
                     ),
                   ],
                 ),
-              )
-            ],
-          ) : Center(
-            child: SizedBox(
-              width: 100,
-              height: 100,
-              child: CircularProgressIndicator(),
-            ),
-          );
+                Padding(padding: EdgeInsets.all(20),),
+                Center(
+                  child: Text(
+                    "Menu".toUpperCase(),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25
+                    ),
+                  ),
+                ),
+                Padding(padding: EdgeInsets.all(20)),
+                Flexible(
+                  fit: FlexFit.loose,
+                  child: CustomScrollView(
+                    shrinkWrap: true,
+                    slivers: <Widget>[
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+                          return productItem(
+                              context,
+                              _barInfo.products[index],
+                              addToCart: (item) => _addToCart(item),
+                              removeFromCart: (item) => _removeFromCart(item)
+                          );
+                        },
+                          childCount: _barInfo.products.length,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            );
+          } else {
+            return Center(
+              child: SizedBox(
+                width: 100,
+                height: 100,
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
         }
     );
+  }
+
+  // TODO : Handle error
+  void    _favClicked(BarInfo barInfo) {
+
+    if (barInfo.barDetails.isFavorite) {
+      removeFromFavorites(barInfo.barDetails.id).then((value) {
+        if (value == "deleted")
+          _updateFavoritesUI() ;
+      });
+    } else {
+      addToFavorites(barInfo.barDetails.id).then((value) {
+        if (value == "Added!")
+          _updateFavoritesUI() ;
+      });
+    }
+  }
+
+  void    _updateFavoritesUI() {
+    getBarInfo(widget.bar).then((value) {
+      setState(() {
+        _barInfo.barDetails.favorites = value.barDetails.favorites ;
+        _barInfo.barDetails.isFavorite = value.barDetails.isFavorite ;
+      });
+    });
   }
 
   void    _addToCart(Product toAdd) {
@@ -235,7 +278,7 @@ class _PageBarState extends State<PageBar> {
           ],
         ),
 
-        Image.asset("assets/favorites.png"),
+        Image.asset("assets/favorite_empty.png"),
         Padding(padding: EdgeInsets.all(20),),
         Center(
           child: Text(
