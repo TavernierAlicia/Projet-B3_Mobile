@@ -29,7 +29,7 @@ class _PageBarState extends State<PageBar> {
   @override
   void initState() {
     print("In initState ; bar = ${widget.bar.name}");
-    _barInfo = getBarInfos(widget.bar);
+    _barInfo = getBarInfo(widget.bar);
     super.initState();
   }
 
@@ -139,7 +139,7 @@ class _PageBarState extends State<PageBar> {
                             removeFromCart: (item) => _removeFromCart(item)
                         );
                       },
-                        childCount: (snapshot.data as List<Product>).length,
+                        childCount: (snapshot.data as BarInfo).products.length,
                       ),
                     ),
                   ],

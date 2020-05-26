@@ -19,17 +19,15 @@ Future<List<Bar>>    getBarsList() async {
   return barsList ;
 }
 
-Future<BarInfo>   getBarInfos(Bar bar) async {
+Future<BarInfo>   getBarInfo(Bar bar) async {
   String    url = BASE_URL + "show/${bar.id}" ;
   Map<String, String> headers = {
     "Authorization" : "dcdb199e-2797-4041-8b26-08bc451dd47b"
   } ;
 
-  print("IN GET BAR INFOS ");
   Response  response = await get(url, headers: headers) ;
   var       data = (json.decode(response.body)) ;
   var       barInfo = BarInfo.fromJson(data) ;
 
-  print("BAR INFO RESULT = ${barInfo.name}");
   return barInfo ;
 }
