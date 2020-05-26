@@ -26,9 +26,10 @@ class _PageBarsState extends State<PageBars> {
   Permission                      _accessPosition = Permission.locationAlways ;
 
   /// Map variables
-  Completer<GoogleMapController>  _controller = Completer();
+  GoogleMapController             _mapController ;
   Geolocator                      _geolocator = Geolocator();
   Position                        _userLocation ;
+  List<Marker>                    _markers ;
 
   Future<List<Bar>>   _barsList ;
 
@@ -71,13 +72,7 @@ class _PageBarsState extends State<PageBars> {
       if (!value) {
         _getPermissions();
       } else {
-        _getLocation().then((value) {
-          setState(() {
-            print("Getting userLocation : ${value}");
-            _userLocation = value ;
-          });
-        });
-        // TODO : Listen for location updates
+        _getLocation();
       }
     });
     super.initState();
@@ -86,11 +81,10 @@ class _PageBarsState extends State<PageBars> {
   void    _getPermissions() async {
     await Permission.locationAlways.request().then((value) {
       print("PERMISSION RESPONSE = $value");
-      _getLocation().then((value) {
-        setState(() {
-          _userLocation = value ;
-        });
-      });
+      if (value == PermissionStatus.granted) {
+        _getLocation();
+      }
+      // TODO : Handle no+
       /*_location.onLocationChanged().listen((value) {
         setState(() {
           print("NEW LOCATION = $value");
@@ -100,7 +94,35 @@ class _PageBarsState extends State<PageBars> {
     }) ;
   }
 
-  Future<Position>    _getLocation() async {
+  void                _getLocation() {
+    _waitForLocation().then((value) {
+      setState(() {
+        /// When userLocation is retrieved, we set _userLocation and animate the
+        /// map with a zoom on the new coords.
+        print("GOT USER COORDS ; ANIMATING CAMERA");
+        _userLocation = value ;
+        _mapController.animateCamera(
+          CameraUpdate.newLatLngZoom(
+            LatLng(value.latitude, value.longitude),
+            10,
+          ),
+        );
+      });
+    });
+    _geolocator.getPositionStream(
+      LocationOptions(
+        accuracy: LocationAccuracy.best,
+        timeInterval: 1000,
+      ),
+    ).listen((event) {
+      setState(() {
+        print("New location : $event");
+        _userLocation = event ;
+      });
+    });
+  }
+
+  Future<Position>    _waitForLocation() async {
     print("IN GET LOCATION");
     var currentLocation ;
     try {
@@ -120,7 +142,7 @@ class _PageBarsState extends State<PageBars> {
     _screenSize = MediaQuery.of(context).size ;
 
     _barsList.then((value) {
-
+      _markers = _markersGenerator(value) ;
     });
 
     return Scaffold(
@@ -342,12 +364,13 @@ class _PageBarsState extends State<PageBars> {
               onMapCreated: (GoogleMapController controller) {
                 print("Map is created");
                 setState(() {
-                  _controller.complete(controller);
+                  _mapController = controller ;
                 });
               },
               initialCameraPosition: CameraPosition(
-                target: LatLng(37.4219999, -122.0862462),
+                target: LatLng(_userLocation.latitude, _userLocation.longitude),
               ),
+              markers: Set<Marker>.of(_markers),
             )
         )
       ],
@@ -367,6 +390,36 @@ class _PageBarsState extends State<PageBars> {
   }
 
   /// Builds a list of Marker objects, given the bars list.
+  List<Marker>   _markersGenerator(List<Bar> barsList) {
+
+    List<Marker> result = [] ;
+    var markerImage ;
+
+    BitmapDescriptor.fromAssetImage(
+      ImageConfiguration.empty,
+      "assets/location_pin.png",
+    ).then((value) => markerImage = value );
+
+    barsList.forEach((element) {
+      result.add(
+        Marker(
+          markerId: MarkerId(UniqueKey().toString()),
+          position: element.coordinates,
+          icon: markerImage,
+          onTap: (() {
+            print("Clicked on ${element.name}");
+            _mapController.animateCamera(
+              CameraUpdate.newLatLng(
+                element.coordinates,
+              ),
+            );
+            _showBarPreview(element);
+          })
+        ),
+      );
+    });
+    return result ;
+  }
 /*  List<Marker>    _markersGenerator(List<Bar> barsList) {
     List<Marker> result = [];
 
