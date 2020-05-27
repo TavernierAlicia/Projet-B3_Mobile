@@ -5,7 +5,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 class Bar {
 
   Bar(int id, String name, String description, String type, String subtype,
-      double lat, double long, String imageUrl, String date) {
+      double lat, double long, String imageUrl, String date, int streetNum,
+      String streetName, String city, String zip, String happyHourStart,
+      String happyHourEnd) {
     print("In default constructor, name = $name");
     this.id = id ;
     this.name = name ;
@@ -15,6 +17,12 @@ class Bar {
     this.coordinates = LatLng(lat, long) ;
     this.imageUrl = imageUrl ;
     this.date = date ;
+    this.streetNum = streetNum ;
+    this.streetName = streetName ;
+    this.city = city ;
+    this.zip = zip ;
+    this.happyHourStart = happyHourStart ;
+    this.happyHourEnd = happyHourEnd ;
   }
 
   factory Bar.fromJson(Map<String, dynamic> jsonMap) {
@@ -29,6 +37,12 @@ class Bar {
       jsonMap["Long"],
       jsonMap["Pic"],
       jsonMap["Date"],
+      jsonMap["StreetNum"],
+      jsonMap["StreetName"],
+      jsonMap["City"],
+      jsonMap["Zip"],
+      jsonMap["Happy"],
+      jsonMap["HappyEnd"],
     );
   }
 
@@ -40,4 +54,10 @@ class Bar {
   LatLng  coordinates ;
   String  imageUrl ;
   String  date ;
+  int     streetNum ;
+  String  streetName ;
+  String  city ;
+  String  zip ;
+  String  happyHourStart ;
+  String  happyHourEnd ;
 }

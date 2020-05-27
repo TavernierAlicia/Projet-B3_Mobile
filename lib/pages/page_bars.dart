@@ -29,6 +29,7 @@ class _PageBarsState extends State<PageBars> {
   Geolocator                      _geoLocator = Geolocator();
   Position                        _userLocation ;
   List<Marker>                    _markers = [] ;
+  Set<Marker>                     _markersSet = Set() ;
 
   Future<List<Bar>>               _barsList ;
 
@@ -130,6 +131,7 @@ class _PageBarsState extends State<PageBars> {
 
     _barsList.then((value) {
       _markers = _markersGenerator(value) ;
+      _markersSet = Set.from(_markers) ;
     });
 
     return Scaffold(
@@ -383,7 +385,7 @@ class _PageBarsState extends State<PageBars> {
             initialCameraPosition: CameraPosition(
               target: LatLng(_userLocation.latitude, _userLocation.longitude),
             ),
-            markers: Set<Marker>.of(_markers),
+            markers: _markersSet,
             zoomControlsEnabled: false,
             myLocationEnabled: true,
           ),
@@ -403,6 +405,11 @@ class _PageBarsState extends State<PageBars> {
         _searchResultsFuture = searchBars(search);
         _isSearchEnabled = true ;
       });
+    _searchResultsFuture.then((value) {
+      print("Search results future finished");
+      _markers = _markersGenerator(value);
+      _markersSet = Set.of(_markers);
+    });
   }
 
   Widget          _displaySearchResults() {
