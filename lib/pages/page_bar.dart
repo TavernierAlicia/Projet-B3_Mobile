@@ -12,6 +12,7 @@ class PageBar extends StatefulWidget {
   PageBar({Key key, this.bar}) : super(key: key);
 
   final Bar bar ;
+  // TODO : Set bar id ; bar name & bar image instead
 
   @override
   _PageBarState createState() => _PageBarState();
@@ -132,6 +133,7 @@ class _PageBarState extends State<PageBar> {
                 (_barInfo.products.isNotEmpty)
                     ? _displayMenu()
                     : _noMenu(),
+                Padding(padding: EdgeInsets.all(30),),
               ],
             );
           } else {
@@ -165,40 +167,42 @@ class _PageBarState extends State<PageBar> {
   }
 
   Widget  _displayMenu() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Center(
-          child: Text(
-            "Menu".toUpperCase(),
-            style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 25
+    return Expanded(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Center(
+            child: Text(
+              "Menu".toUpperCase(),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 25
+              ),
             ),
           ),
-        ),
-        Padding(padding: EdgeInsets.all(20)),
-        Flexible(
-          fit: FlexFit.loose,
-          child: CustomScrollView(
-            shrinkWrap: true,
-            slivers: <Widget>[
-              SliverList(
-                delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-                  return productItem(
-                      context,
-                      _barInfo.products[index],
-                      addToCart: (item) => _addToCart(item),
-                      removeFromCart: (item) => _removeFromCart(item)
-                  );
-                },
-                  childCount: _barInfo.products.length,
+          Padding(padding: EdgeInsets.all(20)),
+          Flexible(
+            fit: FlexFit.loose,
+            child: CustomScrollView(
+              shrinkWrap: true,
+              slivers: <Widget>[
+                SliverList(
+                  delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+                    return productItem(
+                        context,
+                        _barInfo.products[index],
+                        addToCart: (item) => _addToCart(item),
+                        removeFromCart: (item) => _removeFromCart(item)
+                    );
+                  },
+                    childCount: _barInfo.products.length,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        )
-      ],
+        ],
+      ),
     );
   }
 

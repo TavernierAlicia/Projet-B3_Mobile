@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:projet_b3/model/bar.dart';
 import 'package:projet_b3/model/favorite.dart';
+import 'package:projet_b3/pages/page_bar.dart';
 
 Widget    favoriteItem(context, Favorite favorite, {
   removeItem(Favorite favorite)
@@ -20,91 +22,117 @@ Widget    favoriteItem(context, Favorite favorite, {
           Image.asset("assets/trash.png"),
         ],
       ),
-      child: Card(
-        elevation: 5,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          children: <Widget>[
-            ClipRRect(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10),
-                topRight: Radius.circular(10),
-              ),
-              child: Container(
-                height: 150,
-                width: double.maxFinite,
-                child: Image.network(
+      child: InkWell(
+        onTap: (() {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => PageBar(
+                bar: Bar(
+                  favorite.id,
+                  favorite.name,
+                  "",
+                  favorite.type,
+                  favorite.subtype,
+                  0, 0,
                   favorite.imageUrl,
-                  fit: BoxFit.fitWidth,
+                  favorite.date,
+                  int.parse(favorite.streetNum),
+                  favorite.streetName,
+                  "",
+                  "",
+                  "",
+                  ""
                 ),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    width: _screenWidth / 5,
-                    height: _screenWidth / 5,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                        fit: BoxFit.fill,
-                        image: NetworkImage(favorite.imageUrl), // TODO
+          );
+        }),
+        child: Card(
+          elevation: 5,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            children: <Widget>[
+              ClipRRect(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  topRight: Radius.circular(10),
+                ),
+                child: Container(
+                  height: 150,
+                  width: double.maxFinite,
+                  child: Image.network(
+                    favorite.imageUrl,
+                    fit: BoxFit.fitWidth,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                      width: _screenWidth / 5,
+                      height: _screenWidth / 5,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          fit: BoxFit.fill,
+                          image: NetworkImage(favorite.imageUrl), // TODO
+                        ),
                       ),
                     ),
-                  ),
-                  Padding(padding: EdgeInsets.all(5),),
-                  Expanded(
-                    flex: 4,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          favorite.name.toUpperCase(),
-                          style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold
+                    Padding(padding: EdgeInsets.all(5),),
+                    Expanded(
+                      flex: 4,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            favorite.name.toUpperCase(),
+                            style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold
+                            ),
                           ),
-                        ),
-                        Text(
-                            "Bar a ${favorite.subtype}"
-                        ),
-                        Text(
-                          favorite.address,
-                        ),
-                        Text(
-                            "Ouvert jusqu'a 23h59"
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Column(
-                      children: <Widget>[
-                        Image.asset(
-                          "assets/favorite_full.png",
-                          scale: 2,
-                        ),
-                        Text(
-                          favorite.nbFav.toString(),
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold
+                          Text(
+                              "Bar a ${favorite.subtype}"
                           ),
-                        ),
-                      ],
+                          Text(
+                            favorite.address,
+                          ),
+                          Text(
+                              "Ouvert jusqu'a 23h59"
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                    Expanded(
+                      flex: 1,
+                      child: Column(
+                        children: <Widget>[
+                          Image.asset(
+                            "assets/favorite_full.png",
+                            scale: 2,
+                          ),
+                          Text(
+                            favorite.nbFav.toString(),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     ),

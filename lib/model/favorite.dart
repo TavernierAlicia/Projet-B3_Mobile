@@ -1,12 +1,14 @@
 class Favorite {
 
-  Favorite(int id, String name, String type, String subtype, String address,
-      String imageUrl, String date, int nbFav) {
+  Favorite(int id, String name, String type, String subtype, String streetNum,
+      String streetName, String imageUrl, String date, int nbFav) {
     this.id = id ;
     this.name = name ;
     this.type = type ;
     this.subtype = subtype ;
-    this.address = address ;
+    this.streetNum = streetNum ;
+    this.streetName = streetName ;
+    this.address = "$streetNum $streetName" ;
     this.imageUrl = imageUrl ;
     this.date = date ;
     this.nbFav = nbFav ;
@@ -18,7 +20,8 @@ class Favorite {
       jsonMap["Name"],
       jsonMap["Type"],
       jsonMap["Subtype"],
-      "${jsonMap["Street_num"]} ${jsonMap["Street_name"]}",
+      jsonMap["Street_num"],
+      jsonMap["Street_name"],
       jsonMap["Pic"],
       jsonMap["DateAdded"],
       jsonMap["NbFavs"],
@@ -29,6 +32,8 @@ class Favorite {
   String  name ;
   String  type ;
   String  subtype ;
+  String  streetNum ;
+  String  streetName ;
   String  address ;
   String  imageUrl ;
   String  date ;
