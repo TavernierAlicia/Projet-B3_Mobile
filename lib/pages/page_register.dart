@@ -10,8 +10,9 @@ class PageRegister extends StatefulWidget {
 
 class _PageRegisterState extends State<PageRegister> {
 
-  final   _formKey = GlobalKey<FormState>() ;
-  double  _screenWidth = 0 ;
+  BuildContext    _context ;
+  final           _formKey = GlobalKey<FormState>() ;
+  double          _screenWidth = 0 ;
 
   final   TextEditingController   _firstNameController = TextEditingController();
   final   TextEditingController   _nameController = TextEditingController();
@@ -24,6 +25,7 @@ class _PageRegisterState extends State<PageRegister> {
   @override
   Widget build(BuildContext context) {
 
+    _context = context ;
     _screenWidth = MediaQuery.of(context).size.width ;
 
     return Scaffold(
@@ -225,7 +227,11 @@ class _PageRegisterState extends State<PageRegister> {
               _confPassController.text,
               _birthDayController.text,
               _phoneController.text,
-            );
+            ).then((value) {
+              if (value == "Mail already exists") {
+              } else {
+              }
+            });
           }),
         ),
       ],
