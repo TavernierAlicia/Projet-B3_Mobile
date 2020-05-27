@@ -28,7 +28,8 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
 
-    _selectedPageIndex = widget.selectedPageDefault ;
+    if (widget.selectedPageDefault != 0)
+      _selectedPageIndex = widget.selectedPageDefault ;
     _screenWidth = MediaQuery.of(context).size.width ;
     print("SCREEN WIDTH = $_screenWidth");
     var singletonInstance = Singleton.instance ;

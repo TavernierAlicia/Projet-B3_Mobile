@@ -75,17 +75,19 @@ class _PageBarsState extends State<PageBars> {
       if (!value) {
         _getPermissions();
       } else {
-        _getLocation();
+//        _getLocation();
+        _waitForLocation();
       }
     });
     super.initState();
   }
 
   void    _getPermissions() async {
-    await Permission.locationAlways.request().then((value) {
+    await Permission.location.request().then((value) {
       print("PERMISSION RESPONSE = $value");
       if (value == PermissionStatus.granted) {
-        _getLocation();
+//        _getLocation();
+        _waitForLocation();
       }
       // TODO : Handle no+
     }) ;
@@ -111,8 +113,21 @@ class _PageBarsState extends State<PageBars> {
   Future<Position>    _waitForLocation() async {
     var currentLocation ;
     try {
+      print("IN TRY : WAITING FOR LOCATION");
       currentLocation = await _geoLocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.best,
+      ).timeout(
+        Duration(milliseconds: 5000),
+        onTimeout: () {
+          print("Time out triggered.");
+          setState(() {
+            _userLocation = Position(
+              latitude: 48.8534100,
+              longitude: 2.3488000,
+            );
+          });
+          return _userLocation;
+        }
       );
     } catch (e) {
       print("CATCHING ERROR : $e");
