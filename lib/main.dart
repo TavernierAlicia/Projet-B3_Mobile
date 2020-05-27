@@ -8,6 +8,7 @@ import 'package:splashscreen/splashscreen.dart';
 void main() {
   runApp(MaterialApp(
     home: MyApp(),
+    title: "Order'N Drink",
   ));
 }
 
@@ -28,9 +29,9 @@ class _MyAppState extends State<MyApp> {
         DeviceOrientation.portraitUp,
       ],
     );
-    
+
     return new SplashScreen(
-      seconds: 15,  // TODO
+      seconds: 5,  // TODO
       navigateAfterSeconds: (isUserLoggedIn) ? MainPage() : PageLogin(),
       backgroundColor: Colors.deepOrange,
       styleTextUnderTheLoader: new TextStyle(),
