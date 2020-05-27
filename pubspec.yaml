@@ -31,6 +31,7 @@ dependencies:
   google_maps_flutter: ^0.5.28+1
   permission_handler: ^5.0.0+hotfix.6
   geolocator: ^5.3.1
+  splashscreen: ^1.2.0
 
 dev_dependencies:
   flutter_test:
@@ -62,6 +63,7 @@ flutter:
     - assets/instagram.png
     - assets/location_pin.png
     - assets/logging_in.gif
+    - assets/logo.png
     - assets/money.png
     - assets/orders_full.png
     - assets/orders_empty.png
