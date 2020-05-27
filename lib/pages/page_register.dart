@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:projet_b3/pages/page_register_confirm.dart';
 import 'package:projet_b3/requests/account_requests.dart';
 
 class PageRegister extends StatefulWidget {
@@ -265,7 +266,12 @@ class _PageRegisterState extends State<PageRegister> {
                   ),
                 );
               } else {
-                // TODO : Go to confirm page
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PageRegisterConfirm(),
+                  ),
+                );
               }
             });
           }
