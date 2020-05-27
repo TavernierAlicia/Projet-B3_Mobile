@@ -59,7 +59,6 @@ class _PageBarsState extends State<PageBars> {
   Future<List<Bar>>   _searchResultsFuture ;
   bool                _isSearchEnabled = false ;
 
-  // TODO : No need to create a list
   Filter  _filtersSelectedType = _barTypes[0] ;
   Filter  _filtersSelectedPopularity = _barPopularity[0] ;
   Filter  _filtersSelectedDistance = _barDistance[0] ;
@@ -491,6 +490,9 @@ class _PageBarsState extends State<PageBars> {
                         });
                       });
                       _searchBarController.clear();
+                      _filtersSelectedType = _barTypes[0] ;
+                      _filtersSelectedPopularity = _barPopularity[0] ;
+                      _filtersSelectedDistance = _barDistance[0] ;
                     }),
                     child: Icon(Icons.close),
                   ),
