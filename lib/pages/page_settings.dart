@@ -17,7 +17,7 @@ class _PageSettingsState extends State<PageSettings> {
         title: Text("Settings"),
       ),
       body: new Center(
-
+        child: Text("Feature not implemented yet."),
       ),
     );
   }

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:projet_b3/colors.dart';
 import 'package:projet_b3/pages/page_main.dart';
+import 'package:projet_b3/pages/page_register.dart';
+import 'package:projet_b3/singleton.dart';
 import 'package:projet_b3/user_data.dart';
+import 'package:projet_b3/requests/account_requests.dart';
+import 'package:projet_b3/views/form_item.dart';
 
 class PageLogin extends StatefulWidget {
   PageLogin({Key key}) : super(key: key);
@@ -13,6 +17,8 @@ class PageLogin extends StatefulWidget {
 class _PageLoginState extends State<PageLogin> {
 
   double                        _screenWidth ;
+  final                         _formKey = GlobalKey<FormState>() ;
+  BuildContext                  _scaffoldContext ;
 
   final TextEditingController   _loginController = TextEditingController() ;
   final TextEditingController   _passwordController = TextEditingController() ;
@@ -53,70 +59,58 @@ class _PageLoginState extends State<PageLogin> {
       )
           : null,
       backgroundColor: ClickNDrinkColors.WHITE,
-      body: _loginBody(),
+      body: Builder(
+        builder: (scaffoldContext) => _loginBody(scaffoldContext),
+      ),
     );
   }
 
-  Widget    _loginBody() {
+  Widget    _loginBody(BuildContext scaffoldContext) {
+
+    _scaffoldContext = scaffoldContext ;
+
     return Container(
       alignment: Alignment.center,
       padding: EdgeInsets.only(top: 20, left: 20, right: 20),
       child: Column(
         children: <Widget>[
-          _loginRequest(),
-          Padding(padding: EdgeInsets.only(top: 20),),
-          _passwordRequest(),
+          Form(
+            key: _formKey,
+            child: Column(
+              children: <Widget>[
+                formItem(
+                  "Identifiant",
+                  "Entrez l'identifiant",
+                  _basicValidator,
+                  _loginController,
+                ),
+                formItem(
+                  "Mot de passe",
+                  "Entrez le mot de passe",
+                  _basicValidator,
+                  _passwordController,
+                  obscureText: true,
+                ),
+              ],
+            ),
+          ),
           Padding(padding: EdgeInsets.only(top: 10),),
           _forgotPassword(),
           Padding(padding: EdgeInsets.only(top: 40),),
           _loginButton(),
           Padding(padding: EdgeInsets.only(top: 20),),
-          _connectionAlternatives(),
-          Padding(padding: EdgeInsets.only(top: 40),),
-          _newUser(),
+          Text("ou"),
+          Padding(padding: EdgeInsets.only(top: 20),),
+          _registerButton(),
+          //Padding(padding: EdgeInsets.only(top: 20),),
+          //_connectionAlternatives(),
         ],
       ),
     );
   }
 
-  Widget    _loginRequest() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text("Identifiant".toUpperCase(),
-          style: TextStyle(
-              color: ClickNDrinkColors.BLACK,
-              fontWeight: FontWeight.bold,
-              fontSize: 15
-          ),
-        ),
-        TextField(
-          decoration: InputDecoration(
-            hintText: "Entrer l'identifiant",
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget    _passwordRequest() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text("Mot de passe".toUpperCase(),
-          style: TextStyle(
-              color: ClickNDrinkColors.BLACK,
-              fontWeight: FontWeight.bold,
-              fontSize: 15
-          ),
-        ),
-        TextField(
-          decoration: InputDecoration(
-            hintText: "Entrer le mot de passe",
-          ),
-        ),
-      ],
-    );
+  String    _basicValidator(String value) {
+    return (value.isEmpty) ? "Ce champ est obligatoire." : null ;
   }
 
   /// TODO : Set an action to perform in case of click.
@@ -148,19 +142,78 @@ class _PageLoginState extends State<PageLogin> {
       child: FlatButton(
         color: ClickNDrinkColors.PRIMARY_COLOR,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(15),
         ),
         child: Text("Se connecter",
           style: TextStyle(
-              color: ClickNDrinkColors.WHITE,
-              fontSize: 15
+            color: ClickNDrinkColors.WHITE,
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
           ),
         ),
         onPressed: (() {
-          _performLogin() ; // TODO
+          if (_formKey.currentState.validate()) {
+            _formKey.currentState.save();
+            _performLogin();
+          }
         }),
       ),
     );
+  }
+
+  Widget    _registerButton() {
+    return ButtonTheme(
+      /// Padding of parent avoid the button to touch screens borders
+      minWidth: _screenWidth,
+      height: 50,
+      child: FlatButton(
+        color: ClickNDrinkColors.PRIMARY_COLOR,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Text("S'inscrire",
+          style: TextStyle(
+            color: ClickNDrinkColors.WHITE,
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        onPressed: (() {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) {
+                return PageRegister() ;
+              }
+            )
+          );
+        }),
+      ),
+    );
+  }
+
+  /// Tries to perform login with the current credentials in the text fields.
+  /// If the login fails, display a Snackbar.
+  /// If the login succeeds, go to MainPage.
+  void _performLogin() {
+    if (_loginController.text.isEmpty || _passwordController.text.isEmpty)
+      return ;
+    login(_loginController.text, _passwordController.text).then((value) {
+      if (value != "Login or password wrong") {
+        var singletonInstance = Singleton.instance ;
+        singletonInstance.hashKey = value ;
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => MainPage(),
+          ),
+        );
+      } else {
+        Scaffold.of(_scaffoldContext).showSnackBar(
+          SnackBar(
+            content: Text("Wrong login or password."),
+          ),
+        );
+      }
+    });
   }
 
   Widget    _connectionAlternatives() {
@@ -215,26 +268,4 @@ class _PageLoginState extends State<PageLogin> {
     );
   }
 
-  Widget    _newUser() {
-    return Container(
-      child: Text("Nouveau membre ?",
-        style: TextStyle(
-          color: ClickNDrinkColors.FIELDS_BACKGROUND_ACCENT,
-          fontSize: 15,
-        ),
-      ),
-    );
-  }
-
-  /// Tries to perform login with the current credentials in the text fields.
-  /// TODO : Set a real login
-  void _performLogin() {
-    setState(() {
-      isUserLoggedIn = true;
-    });
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => MainPage()),
-    );
-  }
 }

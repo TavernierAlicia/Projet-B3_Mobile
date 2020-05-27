@@ -1,10 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong/latlong.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:projet_b3/model/bar.dart';
 import 'package:projet_b3/model/filter.dart';
 import 'package:projet_b3/pages/page_bar.dart';
+import 'package:projet_b3/requests/bar_requests.dart';
+import 'package:projet_b3/views/bar_item.dart';
 import 'package:projet_b3/views/filter_item.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class PageBars extends StatefulWidget {
   PageBars({Key key}) : super(key: key);
@@ -15,15 +20,16 @@ class PageBars extends StatefulWidget {
 
 class _PageBarsState extends State<PageBars> {
 
-  final         _searchBarController = TextEditingController() ;
+  Permission                      _accessPosition = Permission.locationAlways ;
 
-  // TODO : Test purposes only ; replace with a Future that retrieve bars.
-  List         _barsList = [
-    Bar("TestName0", "TestDescription0", 4, "", LatLng(48.8557579, 2.3753418)),
-    Bar("TestName1", "TestDescription1", 4, "", LatLng(43.8557579, 2.3753418)),
-    Bar("TestName2", "TestDescription2", 4, "", LatLng(48.8557579, 3.3753418)),
-    Bar("TestName3", "TestDescription3", 4, "", LatLng(49.8557579, 3.3753418)),
-  ];
+  /// Map variables
+  GoogleMapController             _mapController ;
+  Geolocator                      _geoLocator = Geolocator();
+  Position                        _userLocation ;
+  List<Marker>                    _markers = [] ;
+  Set<Marker>                     _markersSet = Set() ;
+
+  Future<List<Bar>>               _barsList ;
 
   List         _barTypes = [
     Filter('Tous', true),
@@ -48,43 +54,144 @@ class _PageBarsState extends State<PageBars> {
     Filter("Tous", false),
   ];
 
+  /// Text search variables
+  final               _searchBarController = TextEditingController() ;
+  Future<List<Bar>>   _searchResultsFuture ;
+  bool                _isSearchEnabled = false ;
+
   // TODO : No need to create a list
   List<Filter>  _filtersSelectedType = [] ;
   List<Filter>  _filtersSelectedPopularity = [] ;
   List<Filter>  _filtersSelectedDistance = [] ;
 
-  List<Marker>  _markers = [];
+  Size          _screenSize ;
 
-  LatLng        _mapCenter = LatLng(51.5, -0.09) ;
-  double        _mapZoom = 5.0 ;
+  @override
+  void initState() {
+    print("In initState");
+    _barsList = getBarsList();
+    _accessPosition.isGranted.then((value) {
+      print("Permission = $value");
+      if (!value) {
+        _getPermissions();
+      } else {
+//        _getLocation();
+        _waitForLocation();
+      }
+    });
+    super.initState();
+  }
+
+  void    _getPermissions() async {
+    await Permission.location.request().then((value) {
+      print("PERMISSION RESPONSE = $value");
+      if (value == PermissionStatus.granted) {
+//        _getLocation();
+        _waitForLocation();
+      }
+      // TODO : Handle no+
+    }) ;
+  }
+
+  void                _getLocation() {
+    _geoLocator.getPositionStream(
+      LocationOptions(
+        accuracy: LocationAccuracy.best,
+        timeInterval: 1000,
+      ),
+    ).listen((event) {
+      // TODO : Uncomment following when not in debug
+      /*
+      setState(() {
+        // TODO : This might cause memory leaks
+        print("New location : $event");
+        _userLocation = event ;
+      });*/
+    });
+  }
+
+  Future<Position>    _waitForLocation() async {
+    var currentLocation ;
+    try {
+      print("IN TRY : WAITING FOR LOCATION");
+      currentLocation = await _geoLocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.best,
+      ).timeout(
+        Duration(milliseconds: 5000),
+        onTimeout: () {
+          print("Time out triggered.");
+          setState(() {
+            _userLocation = Position(
+              latitude: 48.8534100,
+              longitude: 2.3488000,
+            );
+          });
+          return _userLocation;
+        }
+      );
+    } catch (e) {
+      print("CATCHING ERROR : $e");
+      currentLocation = null ;
+    }
+    _userLocation = currentLocation ;
+    return currentLocation ;
+  }
 
   @override
   Widget build(BuildContext context) {
 
-    _markers = _markersGenerator() ;
+    _screenSize = MediaQuery.of(context).size ;
+
+    _barsList.then((value) {
+      _markers = _markersGenerator(value) ;
+      _markersSet = Set.from(_markers) ;
+    });
 
     return Scaffold(
-        body: Stack(
-            children: <Widget>[
-              Flex(
-                direction: Axis.vertical,
-                children: <Widget>[
-                  _displayMap()
-                ],
-              ),
-              _searchBar(),
-              Positioned(
-                top: 110,
-                left: 20,
-                child: _setFilters(),
-              ),
-              Positioned(
-                bottom: 10,
-                right: 10,
-                child: _centerMap(),
-              ),
-            ]
-        )
+      body: FutureBuilder(
+        future: _waitForLocation(),
+        builder: (context, snapshot) {
+          return (snapshot.data != null) ?
+          Stack(
+              children: <Widget>[
+                _displayMap(),
+                _searchBar(),
+                Positioned(
+                  top: 110,
+                  left: 20,
+                  child: _setFilters(),
+                ),
+                /*(_isSearchEnabled)
+                    ? Positioned(
+                  bottom: 5,
+                  left: 5,
+                  right: 5,
+                  child: _displaySearchResults(),
+                )
+                    : Wrap(
+                  children: <Widget>[
+                    Container(
+                      color: Colors.green,
+                    )
+                  ],
+                ),*/
+                Positioned(
+                  bottom: 10,
+                  right: 10,
+                  child: _centerMap(),
+                ),
+              ]
+          )
+              : Center(
+            child: SizedBox(
+              width: 75,
+              height: 75,
+              child: CircularProgressIndicator(),
+            ),
+          );
+        },
+      ),
+      bottomSheet: (_isSearchEnabled) ? _displaySearchResults() : null,
     );
   }
 
@@ -216,8 +323,12 @@ class _PageBarsState extends State<PageBars> {
   Widget          _centerMap() {
     return GestureDetector(
       onTap: (() {
-        print("Should recenter map");
-        // TODO
+        _mapController.animateCamera(
+          CameraUpdate.newLatLngZoom(
+            LatLng(_userLocation.latitude, _userLocation.longitude),
+            10,
+          ),
+        );
       }),
       child: Image.asset("assets/recenter.png"),
     );
@@ -264,21 +375,35 @@ class _PageBarsState extends State<PageBars> {
   /// Handles the map display.
   /// We are using Open Street Map, as this is a free to use API.
   Widget          _displayMap() {
-    return Flexible(
-      child: FlutterMap(
-        options: MapOptions(
-          center: _mapCenter,
-          zoom: _mapZoom,
-        ),
-        layers: [
-          TileLayerOptions(
-            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            subdomains: ['a', 'b', 'c'],
-            tileProvider: NonCachingNetworkTileProvider(),
+    return Wrap(
+      children: <Widget>[
+        Container(
+          width: _screenSize.width,
+          height: _screenSize.height - 80 ,
+          child: GoogleMap(
+            mapType: MapType.terrain,
+            onMapCreated: (GoogleMapController controller) {
+              print("Map is created");
+              setState(() {
+                print("in setState");
+                _mapController = controller ;
+                _mapController.animateCamera(
+                  CameraUpdate.newLatLngZoom(
+                    LatLng(_userLocation.latitude, _userLocation.longitude),
+                    10,
+                  ),
+                );
+              });
+            },
+            initialCameraPosition: CameraPosition(
+              target: LatLng(_userLocation.latitude, _userLocation.longitude),
+            ),
+            markers: _markersSet,
+            zoomControlsEnabled: false,
+            myLocationEnabled: true,
           ),
-          MarkerLayerOptions(markers: _markers)
-        ],
-      ),
+        )
+      ],
     );
   }
 
@@ -286,25 +411,225 @@ class _PageBarsState extends State<PageBars> {
   /// button.
   void            _performSearch() {
     print("Should perform search about ${_searchBarController.text}");
-    Scaffold.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Feature not implemented yet."),
-        )
+    String search = _searchBarController.text ;
+
+    if (search.isNotEmpty)
+      setState(() {
+        _searchResultsFuture = searchBars(search);
+        _isSearchEnabled = true ;
+      });
+    _searchResultsFuture.then((value) {
+      print("Search results future finished");
+      _markers = _markersGenerator(value);
+      _markersSet = Set.of(_markers);
+    });
+  }
+
+  Widget          _displaySearchResults() {
+
+    return FutureBuilder(
+      future: _searchResultsFuture,
+      builder: ((searchContext, snapshot) {
+
+        print("Building searchResults");
+        if (snapshot.hasData) {
+          return SizedBox(
+            height: 150, // card height
+            child: Stack(
+              children: <Widget>[
+                ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: (snapshot.data as List<Bar>).length,
+                  itemBuilder: (context, index) {
+                    print("ITEM = ${(snapshot.data as List<Bar>)[index].name}");
+                    return  barItem(context, (snapshot.data as List<Bar>)[index]);
+                  },
+                ),
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: GestureDetector(
+                    onTap: (() {
+                      var futureBar = getBarsList();
+                      futureBar.then((value) {
+                        _markers = _markersGenerator(value);
+                        _markersSet = Set.of(_markers);
+                        setState(() {
+                          _isSearchEnabled = false ;
+                          _barsList = futureBar ;
+                        });
+                      });
+                    }),
+                    child: Icon(Icons.close),
+                  ),
+                ),
+              ],
+            ),
+                /*Flexible(
+                  flex: 4,
+                  child: PageView.builder(
+                    itemCount: (snapshot.data as List<Bar>).length,
+                    itemBuilder: (_, i) {
+                      return barItem(context, (snapshot.data as List<Bar>)[index]);
+                    },
+                  ),
+                ),
+                Flexible(
+                  flex: 1,
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    color: Colors.green,
+                  ),
+                ),*/
+          );
+          /*
+          PageView.builder(
+              itemCount: (snapshot.data as List<Bar>).length,
+              itemBuilder: (_, i) {
+                return barItem(context, (snapshot.data as List<Bar>)[index]);
+              },
+            ),
+           */
+/*            ListView.builder(
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              itemCount: (snapshot.data as List<Bar>).length,
+              itemBuilder: (context, index) {
+                print("ITEM = ${(snapshot.data as List<Bar>)[index].name}");
+                return barItem(context, (snapshot.data as List<Bar>)[index]);
+              },
+            ),
+            */
+        } else {
+        return Container() ;
+        }
+      }),
     );
-    // TODO
   }
 
   /// Builds a list of Marker objects, given the bars list.
-  /// TODO : This function should be a Future, as it will get a list of bars
-  /// TODO :    given the users position.
-  List<Marker>    _markersGenerator() {
+  List<Marker>   _markersGenerator(List<Bar> barsList) {
+
+    List<Marker> result = [] ;
+    var markerImage ;
+
+    BitmapDescriptor.fromAssetImage(
+      ImageConfiguration.empty,
+      "assets/location_pin.png",
+    ).then((value) => markerImage = value );
+
+    barsList.forEach((element) {
+      result.add(
+        Marker(
+            markerId: MarkerId(UniqueKey().toString()),
+            position: element.coordinates,
+            icon: markerImage,
+            onTap: (() {
+              print("Clicked on ${element.name}");
+              _mapController.animateCamera(
+                CameraUpdate.newLatLng(
+                  element.coordinates,
+                ),
+              );
+              _showBarPreview(element);
+            })
+        ),
+      );
+    });
+    return result ;
+  }
+
+  void          _showBarPreview(Bar bar) {
+    showDialog(
+        context: context,
+        builder: (dialogContext) {
+          return AlertDialog(
+            content: Wrap(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 75,
+                      height: 75,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                              image: NetworkImage(
+                                bar.imageUrl,
+                              ),
+                              fit: BoxFit.fill
+                          )
+                      ),
+                    ),
+                    Padding(padding: EdgeInsets.all(10),),
+                    Flexible(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            bar.name,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 3,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold
+                            ),
+                          ),
+                          Text("Bar a ${bar.subtype}"),
+                          Text("Ouvert jusqu'a 23h59"),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Padding(padding: EdgeInsets.all(10),),
+                InkWell(
+                  onTap: (() {
+                    print("Clicked !");
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => PageBar(bar: bar),
+                      ),
+                    );
+                  }),
+                  child: Container(
+                    width: double.maxFinite,
+                    decoration: BoxDecoration(
+                        color: Colors.deepOrange,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(30),
+                        )
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(17),
+                      child: Text(
+                        "Acceder a la carte",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+    );
+  }
+
+/*  List<Marker>    _markersGenerator(List<Bar> barsList) {
     List<Marker> result = [];
 
-    _barsList.forEach((bar) {
+    barsList.forEach((element) {
       result.add(Marker(
         width: 50,
         height: 50,
-        point: LatLng(bar.coordinates.latitude, bar.coordinates.longitude),
+        point: LatLng(element.coordinates.latitude, element.coordinates.longitude),
         builder: (context) => Container(
           child: GestureDetector(
             child: Image.asset(
@@ -312,11 +637,11 @@ class _PageBarsState extends State<PageBars> {
               scale: 1.50,
             ),
             onTap: (() {
-              print("Clicked on ${bar.name}");
-              _showBarPreview(bar);
+              print("Clicked on ${element.name}");
+              _showBarPreview(element);
               setState(() {
                 // FIXME : Does not seems to work...
-                _mapCenter = bar.coordinates ;
+                _mapCenter = element.coordinates ;
                 _mapZoom = 10 ;
               });
             }),
@@ -324,66 +649,6 @@ class _PageBarsState extends State<PageBars> {
         ),
       ));
     });
-
     return result ;
-  }
-
-  void          _showBarPreview(Bar bar) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          content: Wrap(
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Image.network(bar.imageUrl),
-                  Column(
-                    children: <Widget>[
-                      Text(bar.name),
-                      // TODO : Category
-                      // TODO : Open hours
-                    ],
-                  )
-                ],
-              ),
-              GestureDetector(
-                onTap: (() {
-                  print("Clicked !");
-                  Navigator.of(context).pop();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => PageBar(bar: bar),
-                    ),
-                  );
-                }),
-                child: Container(
-                  width: double.maxFinite,
-                  decoration: BoxDecoration(
-                    color: Colors.deepOrange,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(30),
-                    )
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Text(
-                      "Acceder a la carte",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      }
-    );
-  }
-
+  } */
 }

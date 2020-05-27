@@ -27,11 +27,21 @@ dependencies:
   flutter_map: ^0.8.2
   latlong: ^0.6.1
   intl: 0.15.7
-
+  http: ^0.12.1
+  google_maps_flutter: ^0.5.28+1
+  permission_handler: ^5.0.0+hotfix.6
+  geolocator: ^5.3.1
+  splashscreen: ^1.2.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+# Used to change launcher icon
+flutter_icons:
+  android: "launcher_icon"
+  ios: false
+  image_path: "assets/launcher_icon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -48,21 +58,29 @@ flutter:
   assets:
     - assets/add.png
     - assets/cb.png
+    - assets/circle.png
     - assets/facebook.png
-    - assets/favorites.png
+    - assets/favorite_empty.png
+    - assets/favorite_full.png
     - assets/filters.png
     - assets/google.png
-    - assets/home.png
+    - assets/home_empty.png
+    - assets/home_full.png
     - assets/instagram.png
     - assets/location_pin.png
     - assets/logging_in.gif
+    - assets/logo.png
     - assets/money.png
-    - assets/orders.png
+    - assets/orders_full.png
+    - assets/orders_empty.png
     - assets/paypal.png
     - assets/recenter.png
     - assets/remove.png
     - assets/search.png
-    - assets/settings.png
+    - assets/settings_empty.png
+    - assets/settings_full.png
+    - assets/trash.png
+    - assets/valid.png
   #  - images/a_dot_burr.jpeg
   #  - images/a_dot_ham.jpeg
 
