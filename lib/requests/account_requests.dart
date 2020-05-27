@@ -10,12 +10,6 @@ Future<String>      createUser(String firstName, String name, String mail,
     String password, String confirmPassword, String birthDate,
     String phone) async {
   String              url = BASE_URL + "createUser/" ;
-  Map<String, String>   headers = {
-    "Accept" : "*/*",
-    "Connection" : "keep-alive",
-    "Content-Type" : "application/json"
-  } ;
-
   String              jsonBody = """
   {
     "name": "$name",
@@ -34,6 +28,22 @@ Future<String>      createUser(String firstName, String name, String mail,
   print("RESPONSE BODY = ${response.body}");
   return (convert.jsonDecode(response.body)) ;
 
+}
+
+Future<String>      login(String email, String password) async {
+  String    url = BASE_URL + "auth/" ;
+  String    jsonBody = """
+    {
+      "mail":"$email",
+      "pass":"$password"
+    }
+  """ ;
+
+  Response      response = await post(url, body: jsonBody);
+  print("RESPONSE STATUS CODE = ${response.statusCode}");
+  print("RESPONSE HEADERS = ${response.headers}");
+  print("RESPONSE BODY = ${response.body}");
+  return (convert.jsonDecode(response.body)) ;
 }
 
 /*

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:projet_b3/pages/page_register_confirm.dart';
 import 'package:projet_b3/requests/account_requests.dart';
+import 'package:projet_b3/views/form_item.dart';
 
 class PageRegister extends StatefulWidget {
   PageRegister({Key key}) : super(key: key);
@@ -49,40 +50,40 @@ class _PageRegisterState extends State<PageRegister> {
                     key: _formKey,
                     child: Column(
                       children: <Widget>[
-                        _formItem(
+                        formItem(
                           "Prenom",
                           "Entrez votre prenom",
                           _basicValidator,
                           _firstNameController,
                         ),
-                        _formItem(
+                        formItem(
                           "Nom",
                           "Entrez votre nom",
                           _basicValidator,
                           _nameController,
                         ),
-                        _formItem(
+                        formItem(
                           "Email",
                           "Entrez votre email",
                           _emailValidator,
                           _emailController,
                         ),
                         _birthDatePicker(),
-                        _formItem(
+                        formItem(
                           "Mot de passe",
                           "Entrez votre mot de passe",
                           _passwordValidator,
                           _passwordController,
                           obscureText: true,
                         ),
-                        _formItem(
+                        formItem(
                           "Confirmez mot de passe",
                           "Confirmez votre mot de passe",
                           _passwordConfirmValidator,
                           _confPassController,
                           obscureText: true,
                         ),
-                        _formItem(
+                        formItem(
                           "Numero de telephone",
                           "Numero de telephone",
                           _phoneNumberValidator,
@@ -146,39 +147,6 @@ class _PageRegisterState extends State<PageRegister> {
       return ("Ce numero est invalide.");
     else
       return (null) ;
-  }
-
-  Widget    _formItem(String title, String hint, validator,
-      TextEditingController controller,
-      { obscureText = false }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(padding: EdgeInsets.only(top: 20),),
-        Text(
-          title.toUpperCase(),
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Padding(padding: EdgeInsets.all(5),),
-        TextFormField(
-          obscureText: obscureText,
-          controller: controller,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.grey[200],
-            hintText: hint,
-            border: OutlineInputBorder(
-              borderSide: BorderSide.none,
-            ),
-          ),
-          validator: ((value) {
-            return (validator(value));
-          }),
-        ),
-      ],
-    );
   }
 
   Widget    _birthDatePicker() {
@@ -269,7 +237,10 @@ class _PageRegisterState extends State<PageRegister> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => PageRegisterConfirm(),
+                    builder: (context) => PageRegisterConfirm(
+                      email: _emailController.text,
+                      password: _passwordController.text,
+                    ),
                   ),
                 );
               }
