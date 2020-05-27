@@ -3,9 +3,12 @@ import 'package:projet_b3/pages/page_bars.dart';
 import 'package:projet_b3/pages/page_favorites.dart';
 import 'package:projet_b3/pages/page_orders.dart';
 import 'package:projet_b3/pages/page_settings.dart';
+import 'package:projet_b3/singleton.dart';
 
 class MainPage extends StatefulWidget {
-  MainPage({Key key}) : super(key: key);
+  MainPage({Key key, this.selectedPageDefault = 0}) : super(key: key);
+
+  final int   selectedPageDefault ;
 
   @override
   _MainPageState createState() => _MainPageState();
@@ -25,8 +28,11 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
 
+    _selectedPageIndex = widget.selectedPageDefault ;
     _screenWidth = MediaQuery.of(context).size.width ;
     print("SCREEN WIDTH = $_screenWidth");
+    var singletonInstance = Singleton.instance ;
+    print("SINGLETON HASH == ${singletonInstance.hashKey}");
 
     return Scaffold(
       body: _pagesList[_selectedPageIndex],
