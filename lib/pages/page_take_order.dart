@@ -32,7 +32,7 @@ class _PageTakeOrderState extends State<PageTakeOrder> {
   @override
   void initState() {
     _orderStatus = takeOrder(
-      widget.bar,
+      widget.bar.id,
       widget.cartContent,
       widget.arrivingIn,
       widget.paymentMethod,

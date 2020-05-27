@@ -8,7 +8,7 @@ import 'package:projet_b3/pages/page_cart.dart';
 import 'package:projet_b3/requests/utils.dart';
 import 'package:http/http.dart';
 
-Future<String>  takeOrder(Bar bar, List<Product> cartContent, int arrivingIn,
+Future<String>  takeOrder(int barId, List<Product> cartContent, int arrivingIn,
     PaymentMethod paymentMethod) async {
   String                url = BASE_URL + "takeOrder" ;
   Map<String, String>   headers = {
@@ -28,7 +28,7 @@ Future<String>  takeOrder(Bar bar, List<Product> cartContent, int arrivingIn,
 
   String                jsonBody = """
     {
-      "etab_id":${bar.id},
+      "etab_id":$barId,
       "instructions":"",
       "waiting_time":"00:$arrivingInString",
       "payment":"${paymentMethod.toString()}",

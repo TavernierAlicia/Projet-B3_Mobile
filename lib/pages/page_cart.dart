@@ -15,7 +15,6 @@ class PageCart extends StatefulWidget {
 }
 
 enum UserPosition {
-  unspecified,
   onTheSpot,
   onMyWay,
 }
@@ -30,7 +29,7 @@ class _PageCartState extends State<PageCart> {
 
   double          _screenWidth = 0 ;
 
-  UserPosition    _currentUserPosition = UserPosition.unspecified ;
+  UserPosition    _currentUserPosition = UserPosition.onTheSpot ;
   PaymentMethod   _selectedPaymentMethod = PaymentMethod.cash ;
   int             _selectedArrivingIn = 0 ;
 

@@ -2,10 +2,12 @@ import 'package:projet_b3/model/bar.dart';
 
 class Order {
 
-  Order(int id, String establishmentName, String pictureUrl, String date,
-      double totalPrice, String status, List<OrderItem> orderItems) {
+  Order(int id, int establishmentId, String establishmentName,
+      String pictureUrl, String date, double totalPrice, String status,
+      List<OrderItem> orderItems) {
 
     this.id = id ;
+    this.establishmentId = establishmentId ;
     this.establishmentName = establishmentName ;
     this.pictureUrl = pictureUrl ;
     this.date = date ;
@@ -19,7 +21,9 @@ class Order {
     List<OrderItem>   _orderItems = [] ;
 
     var commandItems = jsonMap["CmdItems"] as List ;
-    _orderItems = commandItems.map<OrderItem>((json) => OrderItem.fromJson(json)).toList();
+    _orderItems =
+        commandItems.map<OrderItem>((json) => OrderItem.fromJson(json))
+            .toList();
 
     print("ORDER ITEM PARSING OVER");
     _orderItems.forEach((element) {
@@ -30,6 +34,7 @@ class Order {
 
     return Order(
       command["Id"],
+      command["Etab_id"],
       command["Etab_name"],
       command["Pic"],
       command["Date"],
@@ -40,6 +45,7 @@ class Order {
   }
 
   int             id ;
+  int             establishmentId ;
   String          establishmentName ;
   String          pictureUrl ;
   String          date ;
@@ -50,7 +56,8 @@ class Order {
 
 class   OrderItem {
 
-  OrderItem(int commandId, int quantity, String name, double price) {
+  OrderItem(int itemId, int commandId, int quantity, String name, double price){
+    this.itemId = itemId ;
     this.commandId = commandId ;
     this.quantity = quantity ;
     this.name = name ;
@@ -62,6 +69,7 @@ class   OrderItem {
     print("In orderItem factory ; jsonMap = $jsonMap");
 
     return OrderItem(
+      jsonMap["Item_id"],
       jsonMap["CommandId"],
       jsonMap["Quantity"],
       jsonMap["Name"],
@@ -69,6 +77,7 @@ class   OrderItem {
     );
   }
 
+  int     itemId ;
   int     commandId ;
   int     quantity ;
   String  name ;

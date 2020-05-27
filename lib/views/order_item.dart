@@ -4,7 +4,7 @@ import 'package:projet_b3/model/order.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
-Widget orderItem(context, Order order) {
+Widget orderItem(context, Order order, { orderAgain(Order order) }) {
 
   double _screenWidth = MediaQuery.of(context).size.width ;
   initializeDateFormatting("fr_FR");
@@ -65,7 +65,7 @@ Widget orderItem(context, Order order) {
                 ),
               ],
             ),
-            _orderAgainButton(context),
+            _orderAgainButton(order, context, orderAgain),
           ],
         ),
       ),
@@ -73,15 +73,13 @@ Widget orderItem(context, Order order) {
   );
 }
 
-Widget    _orderAgainButton(BuildContext scaffoldContext) {
+Widget    _orderAgainButton(Order order, BuildContext scaffoldContext,
+    orderAgain) {
   return Padding(
     padding: EdgeInsets.only(top: 10),
     child: InkWell(
       onTap: (() {
-        /// TODO
-        Scaffold.of(scaffoldContext).showSnackBar(SnackBar(
-          content: Text("Feature not implemented yet."),
-        ));
+        orderAgain(order) ;
       }),
       child: Container(
         decoration: BoxDecoration(
