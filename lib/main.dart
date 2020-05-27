@@ -9,6 +9,9 @@ void main() {
   runApp(MaterialApp(
     home: MyApp(),
     title: "Order'N Drink",
+    theme: ThemeData(
+      primarySwatch: Colors.deepOrange
+    ),
   ));
 }
 
