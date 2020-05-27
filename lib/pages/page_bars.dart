@@ -418,19 +418,39 @@ class _PageBarsState extends State<PageBars> {
       future: _searchResultsFuture,
       builder: ((searchContext, snapshot) {
 
-        int index = 0;
-
         print("Building searchResults");
         if (snapshot.hasData) {
           return SizedBox(
             height: 150, // card height
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: (snapshot.data as List<Bar>).length,
-              itemBuilder: (context, index) {
-                print("ITEM = ${(snapshot.data as List<Bar>)[index].name}");
-                return  barItem(context, (snapshot.data as List<Bar>)[index]);
-              },
+            child: Stack(
+              children: <Widget>[
+                ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: (snapshot.data as List<Bar>).length,
+                  itemBuilder: (context, index) {
+                    print("ITEM = ${(snapshot.data as List<Bar>)[index].name}");
+                    return  barItem(context, (snapshot.data as List<Bar>)[index]);
+                  },
+                ),
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: GestureDetector(
+                    onTap: (() {
+                      var futureBar = getBarsList();
+                      futureBar.then((value) {
+                        _markers = _markersGenerator(value);
+                        _markersSet = Set.of(_markers);
+                        setState(() {
+                          _isSearchEnabled = false ;
+                          _barsList = futureBar ;
+                        });
+                      });
+                    }),
+                    child: Icon(Icons.close),
+                  ),
+                ),
+              ],
             ),
                 /*Flexible(
                   flex: 4,
