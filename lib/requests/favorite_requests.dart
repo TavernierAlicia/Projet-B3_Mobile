@@ -8,7 +8,7 @@ import 'package:http/http.dart';
 Future<List<Favorite>>    getFavorites() async {
   String    url = BASE_URL + "favs" ;
   Map<String, String> headers = {
-    "Authorization" : "dcdb199e-2797-4041-8b26-08bc451dd47b"
+    "Authorization" : "6d60e931-856c-4927-bca2-344be1cfe135"
   } ;
 
   Response    response = await get(url, headers: headers) ;
@@ -20,7 +20,7 @@ Future<List<Favorite>>    getFavorites() async {
 Future<String>        addToFavorites(int toAddId) async {
   String    url = BASE_URL + "favs/add/" + toAddId.toString() ;
   Map<String, String> headers = {
-    "Authorization" : "dcdb199e-2797-4041-8b26-08bc451dd47b"
+    "Authorization" : "6d60e931-856c-4927-bca2-344be1cfe135"
   } ;
 
   Response    response = await post(url, headers: headers);
@@ -32,7 +32,7 @@ Future<String>        removeFromFavorites(int toRemoveId) async {
   String url = BASE_URL + "favs/delete/" + toRemoveId.toString() ;
   print("URL = $url");
   Map<String, String> headers = {
-    "Authorization" : "dcdb199e-2797-4041-8b26-08bc451dd47b"
+    "Authorization" : "6d60e931-856c-4927-bca2-344be1cfe135"
   } ;
 
   Response    response = await delete(url, headers: headers);
