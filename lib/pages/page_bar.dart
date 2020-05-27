@@ -129,36 +129,9 @@ class _PageBarState extends State<PageBar> {
                   ],
                 ),
                 Padding(padding: EdgeInsets.all(20),),
-                Center(
-                  child: Text(
-                    "Menu".toUpperCase(),
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 25
-                    ),
-                  ),
-                ),
-                Padding(padding: EdgeInsets.all(20)),
-                Flexible(
-                  fit: FlexFit.loose,
-                  child: CustomScrollView(
-                    shrinkWrap: true,
-                    slivers: <Widget>[
-                      SliverList(
-                        delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-                          return productItem(
-                              context,
-                              _barInfo.products[index],
-                              addToCart: (item) => _addToCart(item),
-                              removeFromCart: (item) => _removeFromCart(item)
-                          );
-                        },
-                          childCount: _barInfo.products.length,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
+                (_barInfo.products.isNotEmpty)
+                    ? _displayMenu()
+                    : _noMenu(),
               ],
             );
           } else {
@@ -171,6 +144,61 @@ class _PageBarState extends State<PageBar> {
             );
           }
         }
+    );
+  }
+
+  Widget  _noMenu() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text(
+          "Cet etablissement ne propose aucun produit actuellement.",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget  _displayMenu() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Center(
+          child: Text(
+            "Menu".toUpperCase(),
+            style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 25
+            ),
+          ),
+        ),
+        Padding(padding: EdgeInsets.all(20)),
+        Flexible(
+          fit: FlexFit.loose,
+          child: CustomScrollView(
+            shrinkWrap: true,
+            slivers: <Widget>[
+              SliverList(
+                delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+                  return productItem(
+                      context,
+                      _barInfo.products[index],
+                      addToCart: (item) => _addToCart(item),
+                      removeFromCart: (item) => _removeFromCart(item)
+                  );
+                },
+                  childCount: _barInfo.products.length,
+                ),
+              ),
+            ],
+          ),
+        )
+      ],
     );
   }
 

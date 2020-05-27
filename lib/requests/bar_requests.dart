@@ -55,8 +55,6 @@ Future<List<Bar>>   searchBarsByFilters({
   url += "?" + queryParams.toString();
 
   Response    response = await get(url, headers: headers) ;
-  print("RESPONSE STATUS CODE = ${response.statusCode}");
-  print("RESPONSE BODY = ${response.body}");
   var         barList = (jsonDecode(response.body) as List)
       .map<Bar>((json) => Bar.fromJson(json)).toList();
   return barList ;
@@ -72,5 +70,6 @@ Future<BarInfo>     getBarInfo(Bar bar) async {
   var       data = (json.decode(response.body)) ;
   var       barInfo = BarInfo.fromJson(data) ;
 
+  print("End of getBarInfo request : ${barInfo.barDetails.name} || ${response.body}");
   return barInfo ;
 }
