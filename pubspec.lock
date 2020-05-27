@@ -319,6 +319,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.3"
+  query_params:
+    dependency: "direct main"
+    description:
+      name: query_params
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.6.1"
   quiver:
     dependency: transitive
     description:

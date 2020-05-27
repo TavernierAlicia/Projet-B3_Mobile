@@ -31,7 +31,7 @@ class _PageBarsState extends State<PageBars> {
 
   Future<List<Bar>>               _barsList ;
 
-  List         _barTypes = [
+  static List   _barTypes = [
     Filter('Tous', true),
     Filter('Bar a vins', false),
     Filter('Tapas', false),
@@ -43,15 +43,15 @@ class _PageBarsState extends State<PageBars> {
     Filter('Whiskey', false),
   ];
 
-  List        _barPopularity = [
+  static List   _barPopularity = [
     Filter('Tous', true),
     Filter('Nouveaute', false),
-    Filter('Les plus likes', false),
+    Filter('Les plus likés', false),
   ];
 
-  List        _barDistance = [
-    Filter("Proches", true),
+  static List   _barDistance = [
     Filter("Tous", false),
+    Filter("Proches", true),
   ];
 
   /// Text search variables
@@ -59,10 +59,9 @@ class _PageBarsState extends State<PageBars> {
   Future<List<Bar>>   _searchResultsFuture ;
   bool                _isSearchEnabled = false ;
 
-  // TODO : No need to create a list
-  List<Filter>  _filtersSelectedType = [] ;
-  List<Filter>  _filtersSelectedPopularity = [] ;
-  List<Filter>  _filtersSelectedDistance = [] ;
+  Filter  _filtersSelectedType = _barTypes[0] ;
+  Filter  _filtersSelectedPopularity = _barPopularity[0] ;
+  Filter  _filtersSelectedDistance = _barDistance[0] ;
 
   Size          _screenSize ;
 
@@ -117,17 +116,17 @@ class _PageBarsState extends State<PageBars> {
       currentLocation = await _geoLocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.best,
       ).timeout(
-        Duration(milliseconds: 5000),
-        onTimeout: () {
-          print("Time out triggered.");
-          setState(() {
-            _userLocation = Position(
-              latitude: 48.8534100,
-              longitude: 2.3488000,
-            );
-          });
-          return _userLocation;
-        }
+          Duration(milliseconds: 5000),
+          onTimeout: () {
+            print("Time out triggered.");
+            setState(() {
+              _userLocation = Position(
+                latitude: 48.8534100,
+                longitude: 2.3488000,
+              );
+            });
+            return _userLocation;
+          }
       );
     } catch (e) {
       print("CATCHING ERROR : $e");
@@ -248,6 +247,10 @@ class _PageBarsState extends State<PageBars> {
         ).then((todo) {
           print("Dialog dismissed ; do stuff");
           // TODO - Used when dialog is dismissed - Reload markers on the map
+          print(_filtersSelectedDistance.name) ;
+          print(_filtersSelectedPopularity.name) ;
+          print(_filtersSelectedType.name) ;
+          _performSearchByFilters();
         });
       }),
       child: Image.asset("assets/filters.png"),
@@ -265,12 +268,12 @@ class _PageBarsState extends State<PageBars> {
       children: _barTypes.map((type) {
         return GestureDetector(
           onTap: (() {
-            _filtersSelectedType.clear();
+            _filtersSelectedType = _barTypes[0];
             dialogSetState(() {
-              _filtersSelectedType.add(type);
+              _filtersSelectedType = type;
             });
           }),
-          child: filterItem(type, _filtersSelectedType.contains(type)),
+          child: filterItem(type, _filtersSelectedType == type),
         );
       }).toList(),
     );
@@ -282,17 +285,17 @@ class _PageBarsState extends State<PageBars> {
       crossAxisCount: 1,    // Number of columns
       crossAxisSpacing: 4,  // Space between lines
       mainAxisSpacing: 4,   // Space between columns
-      childAspectRatio: 9,
+      childAspectRatio: 5,
       shrinkWrap: true,
       children: _barPopularity.map((popularity) {
         return GestureDetector(
           onTap: (() {
-            _filtersSelectedPopularity.clear();
+            _filtersSelectedPopularity = _barPopularity[0];
             dialogSetState(() {
-              _filtersSelectedPopularity.add(popularity);
+              _filtersSelectedPopularity = popularity;
             });
           }),
-          child: filterItem(popularity, _filtersSelectedPopularity.contains(popularity)),
+          child: filterItem(popularity, _filtersSelectedPopularity == popularity),
         );
       }).toList(),
     );
@@ -304,17 +307,17 @@ class _PageBarsState extends State<PageBars> {
       crossAxisCount: 2,    // Number of columns
       crossAxisSpacing: 20,  // Space between lines
       mainAxisSpacing: 4,   // Space between columns
-      childAspectRatio: 5,
+      childAspectRatio: 4,
       shrinkWrap: true,
       children: _barDistance.map((distance) {
         return GestureDetector(
           onTap: (() {
-            _filtersSelectedDistance.clear();
+            _filtersSelectedDistance = _barDistance[0];
             dialogSetState(() {
-              _filtersSelectedDistance.add(distance);
+              _filtersSelectedDistance = distance;
             });
           }),
-          child: filterItem(distance, _filtersSelectedDistance.contains(distance)),
+          child: filterItem(distance, _filtersSelectedDistance == distance),
         );
       }).toList(),
     );
@@ -425,6 +428,24 @@ class _PageBarsState extends State<PageBars> {
     });
   }
 
+  void            _performSearchByFilters() {
+    bool needsLocation = _filtersSelectedDistance != _barDistance[0] ;
+    setState(() {
+      _searchResultsFuture = searchBarsByFilters(
+        type: (_filtersSelectedType != _barTypes[0]) ? _filtersSelectedType.name : "",
+        popularity: (_filtersSelectedPopularity != _barPopularity[0]) ? ((_filtersSelectedPopularity != _barPopularity[1]) ? "fav" : "new") : "",
+        distance: (_filtersSelectedDistance != _barDistance[0]) ? "1" : "",
+        lat: (needsLocation) ? _userLocation.latitude.toString() : "",
+        long: (needsLocation) ? _userLocation.longitude.toString() : "",
+      ) ;
+      _isSearchEnabled = true ;
+    });
+    _searchResultsFuture.then((value) {
+      _markers = _markersGenerator(value) ;
+      _markersSet = Set.of(_markers) ;
+    });
+  }
+
   Widget          _displaySearchResults() {
 
     return FutureBuilder(
@@ -435,8 +456,10 @@ class _PageBarsState extends State<PageBars> {
         if (snapshot.hasData) {
           return SizedBox(
             height: 150, // card height
+            width: _screenSize.width,
             child: Stack(
               children: <Widget>[
+                ((snapshot.data as List<Bar>).length > 0) ?
                 ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: (snapshot.data as List<Bar>).length,
@@ -444,6 +467,13 @@ class _PageBarsState extends State<PageBars> {
                     print("ITEM = ${(snapshot.data as List<Bar>)[index].name}");
                     return  barItem(context, (snapshot.data as List<Bar>)[index]);
                   },
+                ) : Center(
+                  child: Text(
+                    "Aucun resultat !",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
                 Positioned(
                   top: 10,
@@ -459,50 +489,19 @@ class _PageBarsState extends State<PageBars> {
                           _barsList = futureBar ;
                         });
                       });
+                      _searchBarController.clear();
+                      _filtersSelectedType = _barTypes[0] ;
+                      _filtersSelectedPopularity = _barPopularity[0] ;
+                      _filtersSelectedDistance = _barDistance[0] ;
                     }),
                     child: Icon(Icons.close),
                   ),
                 ),
               ],
             ),
-                /*Flexible(
-                  flex: 4,
-                  child: PageView.builder(
-                    itemCount: (snapshot.data as List<Bar>).length,
-                    itemBuilder: (_, i) {
-                      return barItem(context, (snapshot.data as List<Bar>)[index]);
-                    },
-                  ),
-                ),
-                Flexible(
-                  flex: 1,
-                  child: Container(
-                    width: 50,
-                    height: 50,
-                    color: Colors.green,
-                  ),
-                ),*/
           );
-          /*
-          PageView.builder(
-              itemCount: (snapshot.data as List<Bar>).length,
-              itemBuilder: (_, i) {
-                return barItem(context, (snapshot.data as List<Bar>)[index]);
-              },
-            ),
-           */
-/*            ListView.builder(
-              shrinkWrap: true,
-              scrollDirection: Axis.horizontal,
-              itemCount: (snapshot.data as List<Bar>).length,
-              itemBuilder: (context, index) {
-                print("ITEM = ${(snapshot.data as List<Bar>)[index].name}");
-                return barItem(context, (snapshot.data as List<Bar>)[index]);
-              },
-            ),
-            */
         } else {
-        return Container() ;
+          return Container();
         }
       }),
     );
