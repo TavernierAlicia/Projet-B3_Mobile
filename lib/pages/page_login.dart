@@ -192,11 +192,11 @@ class _PageLoginState extends State<PageLogin> {
   }
 
   /// Tries to perform login with the current credentials in the text fields.
+  /// If the login fails, display a Snackbar.
+  /// If the login succeeds, go to MainPage.
   void _performLogin() {
-    if (_loginController.text.isEmpty || _passwordController.text.isEmpty) {
-      // TODO : Show error message;
+    if (_loginController.text.isEmpty || _passwordController.text.isEmpty)
       return ;
-    }
     login(_loginController.text, _passwordController.text).then((value) {
       if (value != "Login or password wrong") {
         var singletonInstance = Singleton.instance ;
