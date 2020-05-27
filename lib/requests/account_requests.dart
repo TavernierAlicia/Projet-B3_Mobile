@@ -32,6 +32,17 @@ Future<String>      createUser(String firstName, String name, String mail,
   print("RESPONSE STATUS CODE = ${response.statusCode}");
   print("RESPONSE HEADERS = ${response.headers}");
   print("RESPONSE BODY = ${response.body}");
-  return (response.body) ;
+  return (convert.jsonDecode(response.body)) ;
 
 }
+
+/*
+              An error occured
+              Account created
+              Mail already exists
+*/
+
+/*
+Login wrong
+Password wrong
+ */

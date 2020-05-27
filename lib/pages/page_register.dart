@@ -10,7 +10,6 @@ class PageRegister extends StatefulWidget {
 
 class _PageRegisterState extends State<PageRegister> {
 
-  BuildContext    _context ;
   final           _formKey = GlobalKey<FormState>() ;
   double          _screenWidth = 0 ;
 
@@ -25,7 +24,6 @@ class _PageRegisterState extends State<PageRegister> {
   @override
   Widget build(BuildContext context) {
 
-    _context = context ;
     _screenWidth = MediaQuery.of(context).size.width ;
 
     return Scaffold(
@@ -39,62 +37,66 @@ class _PageRegisterState extends State<PageRegister> {
         centerTitle: true,
         backgroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            children: <Widget>[
-              Form(
-                key: _formKey,
-                child: Column(
-                  children: <Widget>[
-                    _formItem(
-                      "Prenom",
-                      "Entrez votre prenom",
-                      _basicValidator,
-                      _firstNameController,
+      body: Builder(
+        builder: (scaffoldContext) {
+          return SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                children: <Widget>[
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: <Widget>[
+                        _formItem(
+                          "Prenom",
+                          "Entrez votre prenom",
+                          _basicValidator,
+                          _firstNameController,
+                        ),
+                        _formItem(
+                          "Nom",
+                          "Entrez votre nom",
+                          _basicValidator,
+                          _nameController,
+                        ),
+                        _formItem(
+                          "Email",
+                          "Entrez votre email",
+                          _emailValidator,
+                          _emailController,
+                        ),
+                        _birthDatePicker(),
+                        _formItem(
+                          "Mot de passe",
+                          "Entrez votre mot de passe",
+                          _passwordValidator,
+                          _passwordController,
+                          obscureText: true,
+                        ),
+                        _formItem(
+                          "Confirmez mot de passe",
+                          "Confirmez votre mot de passe",
+                          _passwordConfirmValidator,
+                          _confPassController,
+                          obscureText: true,
+                        ),
+                        _formItem(
+                          "Numero de telephone",
+                          "Numero de telephone",
+                          _phoneNumberValidator,
+                          _phoneController,
+                        ),
+                      ],
                     ),
-                    _formItem(
-                      "Nom",
-                      "Entrez votre nom",
-                      _basicValidator,
-                      _nameController,
-                    ),
-                    _formItem(
-                      "Email",
-                      "Entrez votre email",
-                      _emailValidator,
-                      _emailController,
-                    ),
-                    _birthDatePicker(),
-                    _formItem(
-                      "Mot de passe",
-                      "Entrez votre mot de passe",
-                      _passwordValidator,
-                      _passwordController,
-                      obscureText: true,
-                    ),
-                    _formItem(
-                      "Confirmez mot de passe",
-                      "Confirmez votre mot de passe",
-                      _passwordConfirmValidator,
-                      _confPassController,
-                      obscureText: true,
-                    ),
-                    _formItem(
-                      "Numero de telephone",
-                      "Numero de telephone",
-                      _phoneNumberValidator,
-                      _phoneController,
-                    ),
-                  ],
-                ),
+                  ),
+                  Padding(padding: EdgeInsets.all(20),),
+                  _registerButton(scaffoldContext),
+                ],
               ),
-              Padding(padding: EdgeInsets.all(20),),
-              _registerButton(),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -219,26 +221,13 @@ class _PageRegisterState extends State<PageRegister> {
           }),
           onSaved: ((value) {
             print("onSaved, newValue = $value");
-            createUser(
-              _firstNameController.text,
-              _nameController.text,
-              _emailController.text,
-              _passwordController.text,
-              _confPassController.text,
-              _birthDayController.text,
-              _phoneController.text,
-            ).then((value) {
-              if (value == "Mail already exists") {
-              } else {
-              }
-            });
           }),
         ),
       ],
     );
   }
 
-  Widget    _registerButton() {
+  Widget    _registerButton(BuildContext scaffoldContext) {
     return ButtonTheme(
       /// Padding of parent avoid the button to touch screens borders
       minWidth: _screenWidth,
@@ -259,6 +248,26 @@ class _PageRegisterState extends State<PageRegister> {
           print("In onPressed ; validate = ${_formKey.currentState.validate()}");
           if (_formKey.currentState.validate()) {
             _formKey.currentState.save();
+            createUser(
+              _firstNameController.text,
+              _nameController.text,
+              _emailController.text,
+              _passwordController.text,
+              _confPassController.text,
+              _birthDayController.text,
+              _phoneController.text,
+            ).then((value) {
+              print("VALUE = |$value|");
+              if (value != "Account created") {
+                Scaffold.of(scaffoldContext).showSnackBar(
+                  SnackBar(
+                    content: Text(value),
+                  ),
+                );
+              } else {
+                // TODO : Go to confirm page
+              }
+            });
           }
         }),
       ),
