@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:projet_b3/colors.dart';
 import 'package:projet_b3/pages/page_main.dart';
+import 'package:projet_b3/pages/page_register.dart';
 import 'package:projet_b3/user_data.dart';
 
 class PageLogin extends StatefulWidget {
@@ -71,9 +72,11 @@ class _PageLoginState extends State<PageLogin> {
           Padding(padding: EdgeInsets.only(top: 40),),
           _loginButton(),
           Padding(padding: EdgeInsets.only(top: 20),),
-          _connectionAlternatives(),
-          Padding(padding: EdgeInsets.only(top: 40),),
-          _newUser(),
+          Text("ou"),
+          Padding(padding: EdgeInsets.only(top: 20),),
+          _registerButton(),
+          //Padding(padding: EdgeInsets.only(top: 20),),
+          //_connectionAlternatives(),
         ],
       ),
     );
@@ -148,16 +151,47 @@ class _PageLoginState extends State<PageLogin> {
       child: FlatButton(
         color: ClickNDrinkColors.PRIMARY_COLOR,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(15),
         ),
         child: Text("Se connecter",
           style: TextStyle(
-              color: ClickNDrinkColors.WHITE,
-              fontSize: 15
+            color: ClickNDrinkColors.WHITE,
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
           ),
         ),
         onPressed: (() {
           _performLogin() ; // TODO
+        }),
+      ),
+    );
+  }
+
+  Widget    _registerButton() {
+    return ButtonTheme(
+      /// Padding of parent avoid the button to touch screens borders
+      minWidth: _screenWidth,
+      height: 50,
+      child: FlatButton(
+        color: ClickNDrinkColors.PRIMARY_COLOR,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Text("S'inscrire",
+          style: TextStyle(
+            color: ClickNDrinkColors.WHITE,
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        onPressed: (() {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) {
+                return PageRegister() ;
+              }
+            )
+          );
         }),
       ),
     );
@@ -212,17 +246,6 @@ class _PageLoginState extends State<PageLogin> {
           ],
         ),
       ],
-    );
-  }
-
-  Widget    _newUser() {
-    return Container(
-      child: Text("Nouveau membre ?",
-        style: TextStyle(
-          color: ClickNDrinkColors.FIELDS_BACKGROUND_ACCENT,
-          fontSize: 15,
-        ),
-      ),
     );
   }
 
