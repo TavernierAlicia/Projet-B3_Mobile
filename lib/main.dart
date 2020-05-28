@@ -19,7 +19,8 @@ void main() async {
     home: (isLoggedIn) ? MainPage() : PageLogin(),
     title: "Order'N Drink",
     theme: ThemeData(
-        primarySwatch: Colors.deepOrange
+      primarySwatch: Colors.deepOrange,
+      fontFamily: 'Montserrat',
     ),
   ));
 }
