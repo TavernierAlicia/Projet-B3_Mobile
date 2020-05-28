@@ -195,7 +195,7 @@ class _PageLoginState extends State<PageLogin> {
 
   /// Tries to perform login with the current credentials in the text fields.
   /// If the login fails, display a SnackBar.
-  /// If the login succeeds, go to MainPage.
+  /// If the login succeeds, calls [saveUserToken], then go to MainPage.
   void _performLogin() {
     if (_loginController.text.isEmpty || _passwordController.text.isEmpty)
       return ;
