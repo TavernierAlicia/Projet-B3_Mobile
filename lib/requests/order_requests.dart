@@ -9,7 +9,7 @@ import 'package:projet_b3/requests/utils.dart';
 import 'package:http/http.dart';
 
 Future<String>  takeOrder(int barId, List<Product> cartContent, int arrivingIn,
-    PaymentMethod paymentMethod) async {
+    int tip, PaymentMethod paymentMethod) async {
   String                url = BASE_URL + "takeOrder" ;
   Map<String, String>   headers = {
     "Authorization" : "6d60e931-856c-4927-bca2-344be1cfe135"
@@ -32,7 +32,7 @@ Future<String>  takeOrder(int barId, List<Product> cartContent, int arrivingIn,
       "instructions":"",
       "waiting_time":"00:$arrivingInString",
       "payment":"${paymentMethod.toString()}",
-      "tip":0,
+      "tip":$tip,
       "items_id":$products
     }
   """ ;

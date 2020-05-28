@@ -70,6 +70,7 @@ class _PageCartState extends State<PageCart> {
                 bar: widget.bar,
                 cartContent: widget.cartContent,
                 arrivingIn: _selectedArrivingIn,
+                tip: _selectedTip,
                 paymentMethod: _selectedPaymentMethod,
               ),
             ),
@@ -380,7 +381,7 @@ class _PageCartState extends State<PageCart> {
     widget.cartContent.forEach((element) {
       _totalPrice += (element.price * element.quantity);
     });
-    
+
     _totalPrice += _selectedTip ;
 
     return Padding(
