@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:projet_b3/singleton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -14,6 +15,10 @@ class SplashScreen extends StatelessWidget {
 
     retrieveAuthorizationToken().then((value) {
       print("VALUE = $value");
+      if (value != null) {
+        var singletonInstance = Singleton.instance ;
+        singletonInstance.hashKey = value ;
+      }
       completer.complete(value != null) ;
     });
 
