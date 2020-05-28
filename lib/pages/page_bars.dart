@@ -329,7 +329,7 @@ class _PageBarsState extends State<PageBars> {
         _mapController.animateCamera(
           CameraUpdate.newLatLngZoom(
             LatLng(_userLocation.latitude, _userLocation.longitude),
-            10,
+            15,
           ),
         );
       }),
@@ -393,7 +393,7 @@ class _PageBarsState extends State<PageBars> {
                 _mapController.animateCamera(
                   CameraUpdate.newLatLngZoom(
                     LatLng(_userLocation.latitude, _userLocation.longitude),
-                    10,
+                    15,
                   ),
                 );
               });
