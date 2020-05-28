@@ -4,13 +4,14 @@ import 'package:projet_b3/model/bar.dart';
 import 'package:projet_b3/model/bar_info.dart';
 import 'package:projet_b3/requests/utils.dart';
 import 'package:http/http.dart';
+import 'package:projet_b3/utils.dart';
 import 'package:query_params/query_params.dart';
 
 
 Future<List<Bar>>    getBarsList() async {
   String                url = BASE_URL + "show" ;
   Map<String, String>   headers = {
-    "Authorization" : "6d60e931-856c-4927-bca2-344be1cfe135"
+    "Authorization" : "${getAuthorizationToken()}"
   } ;
 
   Response  response = await get(url, headers: headers) ;
@@ -22,7 +23,7 @@ Future<List<Bar>>    getBarsList() async {
 Future<List<Bar>>   searchBars(String search) async {
   String                url = BASE_URL + "search/?search=" + search ;
   Map<String, String>   headers = {
-    "Authorization" : "6d60e931-856c-4927-bca2-344be1cfe135"
+    "Authorization" : "${getAuthorizationToken()}"
   } ;
 
   Response  response = await get(url, headers: headers) ;
@@ -39,7 +40,7 @@ Future<List<Bar>>   searchBarsByFilters({
   String                url = BASE_URL + "show" ;
   URLQueryParams        queryParams = URLQueryParams();
   Map<String, String>   headers = {
-    "Authorization" : "6d60e931-856c-4927-bca2-344be1cfe135"
+    "Authorization" : "${getAuthorizationToken()}"
   } ;
 
   if (type.isNotEmpty)
@@ -63,7 +64,7 @@ Future<List<Bar>>   searchBarsByFilters({
 Future<BarInfo>     getBarInfo(Bar bar) async {
   String                url = BASE_URL + "show/${bar.id}" ;
   Map<String, String>   headers = {
-    "Authorization" : "6d60e931-856c-4927-bca2-344be1cfe135"
+    "Authorization" : "${getAuthorizationToken()}"
   } ;
 
   Response  response = await get(url, headers: headers) ;

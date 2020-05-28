@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:projet_b3/singleton.dart';
+import 'package:projet_b3/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -39,13 +40,4 @@ class SplashScreen extends StatelessWidget {
       ),
     );
   }
-
-  Future<String> retrieveAuthorizationToken() async {
-    SharedPreferences   prefs = await SharedPreferences.getInstance() ;
-
-    final   token = prefs.getString("AUTHORIZATION");
-
-    return token ;
-  }
-
 }

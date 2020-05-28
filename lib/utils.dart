@@ -10,3 +10,18 @@ Future<Null>  saveUserToken(String token) async {
   var singletonInstance = Singleton.instance ;
   singletonInstance.hashKey = token ;
 }
+
+Future<String> retrieveAuthorizationToken() async {
+  SharedPreferences   prefs = await SharedPreferences.getInstance() ;
+
+  final   token = prefs.getString("AUTHORIZATION");
+
+  return token ;
+}
+
+String        getAuthorizationToken() {
+  var singletonInstance = Singleton.instance ;
+  print("SINGLETON HASH == ${singletonInstance.hashKey}");
+  return singletonInstance.hashKey ;
+}
+

@@ -5,10 +5,12 @@ import 'package:projet_b3/model/favorite.dart';
 import 'package:projet_b3/requests/utils.dart';
 import 'package:http/http.dart';
 
+import '../utils.dart';
+
 Future<List<Favorite>>    getFavorites() async {
   String    url = BASE_URL + "favs" ;
   Map<String, String> headers = {
-    "Authorization" : "6d60e931-856c-4927-bca2-344be1cfe135"
+    "Authorization" : "${getAuthorizationToken()}"
   } ;
 
   Response    response = await get(url, headers: headers) ;
@@ -20,7 +22,7 @@ Future<List<Favorite>>    getFavorites() async {
 Future<String>        addToFavorites(int toAddId) async {
   String    url = BASE_URL + "favs/add/" + toAddId.toString() ;
   Map<String, String> headers = {
-    "Authorization" : "6d60e931-856c-4927-bca2-344be1cfe135"
+    "Authorization" : "${getAuthorizationToken()}"
   } ;
 
   Response    response = await post(url, headers: headers);
@@ -32,7 +34,7 @@ Future<String>        removeFromFavorites(int toRemoveId) async {
   String url = BASE_URL + "favs/delete/" + toRemoveId.toString() ;
   print("URL = $url");
   Map<String, String> headers = {
-    "Authorization" : "6d60e931-856c-4927-bca2-344be1cfe135"
+    "Authorization" : "${getAuthorizationToken()}"
   } ;
 
   Response    response = await delete(url, headers: headers);

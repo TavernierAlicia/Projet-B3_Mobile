@@ -1,18 +1,19 @@
 
 import 'dart:convert';
 
-import 'package:projet_b3/model/bar.dart';
 import 'package:projet_b3/model/product.dart';
 import 'package:projet_b3/model/order.dart';
 import 'package:projet_b3/pages/page_cart.dart';
 import 'package:projet_b3/requests/utils.dart';
 import 'package:http/http.dart';
 
+import '../utils.dart';
+
 Future<String>  takeOrder(int barId, List<Product> cartContent, int arrivingIn,
     int tip, PaymentMethod paymentMethod) async {
   String                url = BASE_URL + "takeOrder" ;
   Map<String, String>   headers = {
-    "Authorization" : "6d60e931-856c-4927-bca2-344be1cfe135"
+    "Authorization" : "${getAuthorizationToken()}"
   } ;
 
   List<int> products = [] ;
@@ -47,7 +48,7 @@ Future<String>  takeOrder(int barId, List<Product> cartContent, int arrivingIn,
 Future<List<Order>>     getOrdersHistory() async {
   String        url = BASE_URL + "showOrders" ;
   Map<String, String>   headers = {
-    "Authorization" : "6d60e931-856c-4927-bca2-344be1cfe135"
+    "Authorization" : "${getAuthorizationToken()}"
   } ;
 
   Response    response = await get(url, headers: headers) ;
