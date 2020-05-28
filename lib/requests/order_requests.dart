@@ -31,7 +31,7 @@ Future<String>  takeOrder(int barId, List<Product> cartContent, int arrivingIn,
       "etab_id":$barId,
       "instructions":"",
       "waiting_time":"00:$arrivingInString",
-      "payment":"${paymentMethod.toString()}",
+      "payment":"${paymentMethod.toString().replaceAll("PaymentMethod.", "")}",
       "tip":$tip,
       "items_id":$products
     }
