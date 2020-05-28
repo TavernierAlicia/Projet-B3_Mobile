@@ -8,6 +8,8 @@ import 'package:projet_b3/requests/account_requests.dart';
 import 'package:projet_b3/views/form_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../utils.dart';
+
 class PageLogin extends StatefulWidget {
   PageLogin({Key key}) : super(key: key);
 
@@ -216,15 +218,6 @@ class _PageLoginState extends State<PageLogin> {
         );
       }
     });
-  }
-
-  /// Saves the user [token] in the SharedPreferences and in a Singleton.
-  Future<Null>  saveUserToken(String token) async {
-    SharedPreferences   prefs = await SharedPreferences.getInstance() ;
-    prefs.setString("AUTHORIZATION", token);
-
-    var singletonInstance = Singleton.instance ;
-    singletonInstance.hashKey = token ;
   }
 
   Widget    _connectionAlternatives() {

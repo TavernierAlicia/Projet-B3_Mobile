@@ -3,6 +3,8 @@ import 'package:projet_b3/pages/page_register_confirm.dart';
 import 'package:projet_b3/requests/account_requests.dart';
 import 'package:projet_b3/views/form_item.dart';
 
+import '../utils.dart';
+
 class PageRegister extends StatefulWidget {
   PageRegister({Key key}) : super(key: key);
 
@@ -234,15 +236,17 @@ class _PageRegisterState extends State<PageRegister> {
                   ),
                 );
               } else {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PageRegisterConfirm(
-                      email: _emailController.text,
-                      password: _passwordController.text,
+                saveUserToken(value).then((value) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PageRegisterConfirm(
+                        email: _emailController.text,
+                        password: _passwordController.text,
+                      ),
                     ),
-                  ),
-                );
+                  );
+                });
               }
             });
           }
