@@ -2,23 +2,29 @@ import 'dart:convert' as convert ;
 import 'dart:io';
 //import 'package:http/http.dart';
 
+import 'package:crypto/crypto.dart';
 import 'package:http/http.dart';
 import 'package:projet_b3/requests/utils.dart';
 
-
+/// Hash the user [password] and [confirmPassword] values, then send a request
+/// to the server to create the user account.
 Future<String>      createUser(String firstName, String name, String mail,
     String password, String confirmPassword, String birthDate,
     String phone) async {
   String              url = BASE_URL + "createUser/" ;
+
+  Digest    encryptedPassword = sha256.convert(convert.utf8.encode(password));
+  Digest    encryptedConfirmPassword = sha256.convert(convert.utf8.encode(confirmPassword));
+
   String              jsonBody = """
   {
     "name": "$name",
     "surname": "$firstName",
     "mail": "$mail",
-    "pass": "$password",
+    "pass": "$encryptedPassword",
     "birth": "$birthDate",
     "phone": "$phone",
-    "confirmPass": "$confirmPassword"
+    "confirmPass": "$encryptedConfirmPassword"
   }
   """;
 
@@ -30,12 +36,15 @@ Future<String>      createUser(String firstName, String name, String mail,
 
 }
 
+/// Hash the users [password] value and send a request to the server to get an
+/// authorization token.
 Future<String>      login(String email, String password) async {
   String    url = BASE_URL + "auth/" ;
+  Digest    encryptedPassword = sha256.convert(convert.utf8.encode(password));
   String    jsonBody = """
     {
       "mail":"$email",
-      "pass":"$password"
+      "pass":"$encryptedPassword"
     }
   """ ;
 

@@ -33,6 +33,7 @@ dependencies:
   geolocator: ^5.3.1
   splashscreen: ^1.2.0
   query_params: ^0.6.1
+  crypto: ^2.1.4
 
 dev_dependencies:
   flutter_test:
