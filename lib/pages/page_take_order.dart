@@ -7,16 +7,18 @@ import 'package:projet_b3/requests/order_requests.dart';
 
 class   PageTakeOrder extends StatefulWidget {
   PageTakeOrder({
-        Key key,
-        this.bar,
-        this.cartContent,
-        this.arrivingIn,
-        this.paymentMethod,
-      }) : super(key: key);
+    Key key,
+    this.bar,
+    this.cartContent,
+    this.arrivingIn,
+    this.tip,
+    this.paymentMethod,
+  }) : super(key: key);
 
   final     Bar           bar ;
   final     List<Product> cartContent ;
   final     int           arrivingIn ;
+  final     int           tip ;
   final     PaymentMethod paymentMethod ;
 
   @override
@@ -35,6 +37,7 @@ class _PageTakeOrderState extends State<PageTakeOrder> {
       widget.bar.id,
       widget.cartContent,
       widget.arrivingIn,
+      widget.tip,
       widget.paymentMethod,
     );
     super.initState();
