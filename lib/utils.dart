@@ -43,3 +43,7 @@ void            showFeatureNotReadySnackBar(BuildContext context) {
     ),
   );
 }
+
+String          basicValidator(String value) {
+  return (value.isEmpty) ? "Ce champ est obligatoire." : null ;
+}

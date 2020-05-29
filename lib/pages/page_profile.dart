@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:projet_b3/model/profile.dart';
+import 'package:projet_b3/pages/page_edit_profile.dart';
 import 'package:projet_b3/requests/profile_requests.dart';
 
 class PageProfile extends StatefulWidget {
@@ -156,7 +157,11 @@ class _PageProfileState extends State<PageProfile> {
           ),
         ),
         onPressed: (() {
-          // TODO
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => PageEditProfile(profile: _userProfile,)
+            ),
+          );
         }),
       ),
     );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:projet_b3/pages/page_register_confirm.dart';
 import 'package:projet_b3/requests/account_requests.dart';
 import 'package:projet_b3/requests/utils.dart';
+import 'package:projet_b3/utils.dart';
 import 'package:projet_b3/views/form_item.dart';
 
 class PageRegister extends StatefulWidget {
@@ -55,14 +56,14 @@ class _PageRegisterState extends State<PageRegister> {
                           context,
                           "Prenom",
                           "Entrez votre prenom",
-                          _basicValidator,
+                          basicValidator,
                           _firstNameController,
                         ),
                         formItem(
                           context,
                           "Nom",
                           "Entrez votre nom",
-                          _basicValidator,
+                          basicValidator,
                           _nameController,
                         ),
                         formItem(
@@ -110,10 +111,6 @@ class _PageRegisterState extends State<PageRegister> {
         },
       ),
     );
-  }
-
-  String    _basicValidator(String value) {
-    return (value.isEmpty) ? "Ce champ est obligatoire." : null ;
   }
 
   String    _emailValidator(String value) {
@@ -182,7 +179,7 @@ class _PageRegisterState extends State<PageRegister> {
             ),
           ),
           validator: ((value) {
-            return _basicValidator(value) ;
+            return basicValidator(value) ;
           }),
           onTap: (() {
             print("Should open datePicker");
