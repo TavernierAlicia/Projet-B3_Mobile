@@ -8,7 +8,7 @@ import 'package:projet_b3/requests/utils.dart';
 
 /// Hash the user [password] and [confirmPassword] values, then send a request
 /// to the server to create the user account.
-Future<String>      createUser(String firstName, String name, String mail,
+Future<int>       createUser(String firstName, String name, String mail,
     String password, String confirmPassword, String birthDate,
     String phone) async {
   String              url = BASE_URL + "createUser/" ;
@@ -28,17 +28,14 @@ Future<String>      createUser(String firstName, String name, String mail,
   }
   """;
 
-  Response    response = await post(url, body: jsonBody);
-  print("RESPONSE STATUS CODE = ${response.statusCode}");
-  print("RESPONSE HEADERS = ${response.headers}");
-  print("RESPONSE BODY = ${response.body}");
-  return (convert.jsonDecode(response.body)) ;
-
+  Response              response = await post(url, body: jsonBody);
+  Map<String, dynamic>  serverResponse = convert.jsonDecode(response.body);
+  return (serverResponse["code"] as int);
 }
 
 /// Hash the users [password] value and send a request to the server to get an
 /// authorization token.
-Future<String>      login(String email, String password) async {
+Future<List<dynamic>>        login(String email, String password) async {
   String    url = BASE_URL + "auth/" ;
   Digest    encryptedPassword = sha256.convert(convert.utf8.encode(password));
   String    jsonBody = """
@@ -48,11 +45,9 @@ Future<String>      login(String email, String password) async {
     }
   """ ;
 
-  Response      response = await post(url, body: jsonBody);
-  print("RESPONSE STATUS CODE = ${response.statusCode}");
-  print("RESPONSE HEADERS = ${response.headers}");
-  print("RESPONSE BODY = ${response.body}");
-  return (convert.jsonDecode(response.body)) ;
+  Response              response = await post(url, body: jsonBody);
+  Map<String, dynamic>  serverResponse = convert.jsonDecode(response.body);
+  return ([serverResponse["code"], serverResponse["message"] as String]) ;
 }
 
 /*
