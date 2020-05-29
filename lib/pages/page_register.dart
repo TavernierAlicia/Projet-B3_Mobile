@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:projet_b3/pages/page_register_confirm.dart';
 import 'package:projet_b3/requests/account_requests.dart';
+import 'package:projet_b3/requests/utils.dart';
 import 'package:projet_b3/views/form_item.dart';
 
 class PageRegister extends StatefulWidget {
@@ -51,25 +52,30 @@ class _PageRegisterState extends State<PageRegister> {
                     child: Column(
                       children: <Widget>[
                         formItem(
+                          context,
                           "Prenom",
                           "Entrez votre prenom",
                           _basicValidator,
                           _firstNameController,
                         ),
                         formItem(
+                          context,
                           "Nom",
                           "Entrez votre nom",
                           _basicValidator,
                           _nameController,
                         ),
                         formItem(
+                          context,
                           "Email",
                           "Entrez votre email",
                           _emailValidator,
                           _emailController,
+                          textInputType: TextInputType.emailAddress,
                         ),
                         _birthDatePicker(),
                         formItem(
+                          context,
                           "Mot de passe",
                           "Entrez votre mot de passe",
                           _passwordValidator,
@@ -77,6 +83,7 @@ class _PageRegisterState extends State<PageRegister> {
                           obscureText: true,
                         ),
                         formItem(
+                          context,
                           "Confirmez mot de passe",
                           "Confirmez votre mot de passe",
                           _passwordConfirmValidator,
@@ -84,10 +91,12 @@ class _PageRegisterState extends State<PageRegister> {
                           obscureText: true,
                         ),
                         formItem(
+                          context,
                           "Numero de telephone",
                           "Numero de telephone",
                           _phoneNumberValidator,
                           _phoneController,
+                          textInputType: TextInputType.number,
                         ),
                       ],
                     ),
@@ -227,10 +236,10 @@ class _PageRegisterState extends State<PageRegister> {
               _phoneController.text,
             ).then((value) {
               print("VALUE = |$value|");
-              if (value != "Account created") {
+              if (value != SERVER_RESPONSE_NO_ERROR) {
                 Scaffold.of(scaffoldContext).showSnackBar(
                   SnackBar(
-                    content: Text(value),
+                    content: Text(getServerErrorMessage(value)),
                   ),
                 );
               } else {

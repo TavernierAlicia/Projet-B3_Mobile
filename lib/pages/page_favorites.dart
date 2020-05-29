@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:projet_b3/model/favorite.dart';
 import 'package:projet_b3/requests/favorite_requests.dart';
+import 'package:projet_b3/requests/utils.dart';
 import 'package:projet_b3/views/favorite_item.dart';
 
 class PageFavorites extends StatefulWidget {
@@ -81,12 +82,22 @@ class _PageFavoritesState extends State<PageFavorites> {
   void    _removeFromFavorites(int toRemoveIndex) {
 
     removeFromFavorites(_favoritesList[toRemoveIndex].id).then((value) {
+      Favorite toDeleteItem = _favoritesList[toRemoveIndex] ;
       setState(() {
         _favoritesList.removeAt(toRemoveIndex);
       });
-      Scaffold.of(context).showSnackBar(
-          SnackBar(content: Text("Le bar a été supprimé de votre liste de favoris."),)
-      );
+      if (value[0] != SERVER_RESPONSE_NO_ERROR) {
+        setState(() {
+          _favoritesList.insert(toRemoveIndex, toDeleteItem);
+        });
+        Scaffold.of(context).showSnackBar(
+          SnackBar(content: Text(getServerErrorMessage(value[0])),),
+        );
+      } else {
+        Scaffold.of(context).showSnackBar(
+            SnackBar(content: Text("Le bar a été supprimé de votre liste de favoris."),)
+        );
+      }
     });
   }
 }

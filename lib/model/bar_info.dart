@@ -10,14 +10,26 @@ class BarInfo {
 
   factory BarInfo.fromJson(Map<String, dynamic> json) {
 
+    print("In BarInfo factory ; json = $json");
     List<BarDetails>    _barDetails = [];
     List<Product>       _products = [] ;
 
-    var jsonBarDetails = json["BarDetails"] as List ;
-    var jsonProducts = json["Items"] as List ;
-
-    _barDetails = jsonBarDetails.map<BarDetails>((json) => BarDetails.fromJson(json)).toList();
-    _products = jsonProducts.map<Product>((json) => Product.fromJson(json)).toList() ;
+    if (json != null && json["BarDetails"] != null) {
+      var jsonBarDetails = json["BarDetails"] as List ;
+      if (jsonBarDetails.length > 0) {
+        _barDetails =
+            jsonBarDetails.map<BarDetails>((json) => BarDetails.fromJson(json))
+                .toList();
+      }
+    }
+    if (json != null && json["Items"] != null) {
+      var jsonProducts = json["Items"] as List ;
+      if (jsonProducts.length > 0) {
+        _products =
+            jsonProducts.map<Product>((json) => Product.fromJson(json))
+                .toList() ;
+      }
+    }
 
     return BarInfo(
       _barDetails[0],

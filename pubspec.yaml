@@ -31,7 +31,9 @@ dependencies:
   google_maps_flutter: ^0.5.28+1
   permission_handler: ^5.0.0+hotfix.6
   geolocator: ^5.3.1
-  splashscreen: ^1.2.0
+  query_params: ^0.6.1
+  crypto: ^2.1.4
+  shared_preferences: ^0.5.7+3
 
 dev_dependencies:
   flutter_test:
@@ -54,11 +56,21 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  fonts:
+    - family: Montserrat
+      fonts:
+        - asset: fonts/Montserrat-Regular.ttf
+        - asset: fonts/Montserrat-Bold.ttf
+          weight: 700
+
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/add.png
     - assets/cb.png
     - assets/circle.png
+    - assets/circular_arrow.png
+    - assets/download.png
+    - assets/edit.png
     - assets/facebook.png
     - assets/favorite_empty.png
     - assets/favorite_full.png

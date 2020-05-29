@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:projet_b3/colors.dart';
 import 'package:projet_b3/pages/page_main.dart';
 import 'package:projet_b3/pages/page_register.dart';
+import 'package:projet_b3/requests/utils.dart';
 import 'package:projet_b3/singleton.dart';
 import 'package:projet_b3/user_data.dart';
 import 'package:projet_b3/requests/account_requests.dart';
 import 'package:projet_b3/views/form_item.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../utils.dart';
 
 class PageLogin extends StatefulWidget {
   PageLogin({Key key}) : super(key: key);
@@ -79,12 +83,15 @@ class _PageLoginState extends State<PageLogin> {
             child: Column(
               children: <Widget>[
                 formItem(
+                  context,
                   "Identifiant",
                   "Entrez l'identifiant",
                   _basicValidator,
                   _loginController,
+                  textInputType: TextInputType.emailAddress,
                 ),
                 formItem(
+                  context,
                   "Mot de passe",
                   "Entrez le mot de passe",
                   _basicValidator,
@@ -109,6 +116,7 @@ class _PageLoginState extends State<PageLogin> {
     );
   }
 
+  /// Returns an error message if [value] is empty.
   String    _basicValidator(String value) {
     return (value.isEmpty) ? "Ce champ est obligatoire." : null ;
   }
@@ -192,24 +200,24 @@ class _PageLoginState extends State<PageLogin> {
   }
 
   /// Tries to perform login with the current credentials in the text fields.
-  /// If the login fails, display a Snackbar.
-  /// If the login succeeds, go to MainPage.
+  /// If the login fails, display a SnackBar.
+  /// If the login succeeds, calls [saveUserToken], then go to MainPage.
   void _performLogin() {
     if (_loginController.text.isEmpty || _passwordController.text.isEmpty)
       return ;
     login(_loginController.text, _passwordController.text).then((value) {
-      if (value != "Login or password wrong") {
-        var singletonInstance = Singleton.instance ;
-        singletonInstance.hashKey = value ;
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => MainPage(),
-          ),
-        );
+      if (value[0] as int != SERVER_RESPONSE_NO_ERROR) {
+        saveUserToken(value[1] as String).then((value) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => MainPage(),
+            ),
+          );
+        });
       } else {
         Scaffold.of(_scaffoldContext).showSnackBar(
           SnackBar(
-            content: Text("Wrong login or password."),
+            content: Text(getServerErrorMessage(value[0] as int)),
           ),
         );
       }

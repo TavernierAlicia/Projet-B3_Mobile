@@ -15,7 +15,6 @@ class PageCart extends StatefulWidget {
 }
 
 enum UserPosition {
-  unspecified,
   onTheSpot,
   onMyWay,
 }
@@ -30,9 +29,10 @@ class _PageCartState extends State<PageCart> {
 
   double          _screenWidth = 0 ;
 
-  UserPosition    _currentUserPosition = UserPosition.unspecified ;
+  UserPosition    _currentUserPosition = UserPosition.onTheSpot ;
   PaymentMethod   _selectedPaymentMethod = PaymentMethod.cash ;
   int             _selectedArrivingIn = 0 ;
+  int             _selectedTip = 0 ;
 
   static const String DEFAULT_ARRIVING_IN_TEXT = "J'arrive dans quelques minutes" ;
 
@@ -70,6 +70,7 @@ class _PageCartState extends State<PageCart> {
                 bar: widget.bar,
                 cartContent: widget.cartContent,
                 arrivingIn: _selectedArrivingIn,
+                tip: _selectedTip,
                 paymentMethod: _selectedPaymentMethod,
               ),
             ),
@@ -103,6 +104,7 @@ class _PageCartState extends State<PageCart> {
           _lineSeparator(),
           _orderSummary(),
           _lineSeparator(),
+          (_selectedTip != 0) ? _displaySelectedTip() : Container(),
           _displayTotal(),
           Padding(padding: EdgeInsets.all(10),),
           _userPosition(),
@@ -160,73 +162,56 @@ class _PageCartState extends State<PageCart> {
   Widget    _tips() {
 
     return Container(
-      color: Colors.deepOrangeAccent.withOpacity(0.4),
-      width: _screenWidth,
-      child: Padding(
-        padding: EdgeInsets.all(10),
-        child: Column(
-          children: <Widget>[
-            Text("Je souhaite laisser un pourboire"),
-            Padding(padding: EdgeInsets.all(10),),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.deepOrange
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Text(
-                      "1 €",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.deepOrange
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Text(
-                      "2 €",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 17
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.deepOrange
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Text(
-                      "3 €",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 17
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+        color: Colors.deepOrangeAccent.withOpacity(0.4),
+        width: _screenWidth,
+        child: Padding(
+          padding: EdgeInsets.all(10),
+          child: Column(
+            children: <Widget>[
+              Text("Je souhaite laisser un pourboire"),
+              Padding(padding: EdgeInsets.all(10),),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  _tipItem(1),
+                  _tipItem(2),
+                  _tipItem(3),
+                ],
+              ),
+            ],
+          ),
+        )
+    );
+  }
+
+  Widget    _tipItem(int tipValue) {
+    return InkWell(
+      onTap: (() {
+        setState(() {
+          if (tipValue != _selectedTip)
+            _selectedTip = tipValue ;
+          else
+            _selectedTip = 0 ;
+        });
+      }),
+      child: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: (tipValue == _selectedTip) ? Colors.white : Colors.deepOrange,
+          border: Border.all(color: Colors.deepOrange),
         ),
-      )
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Text(
+            "$tipValue €",
+            style: TextStyle(
+              color: (tipValue == _selectedTip) ? Colors.deepOrange : Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 17,
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -293,11 +278,11 @@ class _PageCartState extends State<PageCart> {
             child: (_showTimeList)
                 ? Container(
               decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.black,
-                  style: BorderStyle.solid,
-                  width: 1,
-                )
+                  border: Border.all(
+                    color: Colors.black,
+                    style: BorderStyle.solid,
+                    width: 1,
+                  )
               ),
               child: DropdownButton(
                 isExpanded: true,
@@ -366,6 +351,29 @@ class _PageCartState extends State<PageCart> {
     );
   }
 
+  Widget    _displaySelectedTip() {
+    return Padding(
+      padding: EdgeInsets.only(left: 40, right: 40, bottom: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Text(
+            "Pourboire",
+            style: TextStyle(
+              fontSize: 15,
+            ),
+          ),
+          Text(
+            "$_selectedTip €",
+            style: TextStyle(
+              fontSize: 15,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget    _displayTotal() {
 
     double    _totalPrice = 0 ;
@@ -373,6 +381,8 @@ class _PageCartState extends State<PageCart> {
     widget.cartContent.forEach((element) {
       _totalPrice += (element.price * element.quantity);
     });
+
+    _totalPrice += _selectedTip ;
 
     return Padding(
       padding: EdgeInsets.only(left: 40, right: 40),
@@ -382,13 +392,15 @@ class _PageCartState extends State<PageCart> {
           Text(
             "Total",
             style: TextStyle(
-                fontSize: 15
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
             ),
           ),
           Text(
             "$_totalPrice €",
             style: TextStyle(
-                fontSize: 15
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ],

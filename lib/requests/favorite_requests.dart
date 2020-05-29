@@ -1,14 +1,15 @@
 import 'dart:convert';
 
-import 'package:projet_b3/model/bar_info.dart';
 import 'package:projet_b3/model/favorite.dart';
 import 'package:projet_b3/requests/utils.dart';
 import 'package:http/http.dart';
 
+import '../utils.dart';
+
 Future<List<Favorite>>    getFavorites() async {
   String    url = BASE_URL + "favs" ;
   Map<String, String> headers = {
-    "Authorization" : "6d60e931-856c-4927-bca2-344be1cfe135"
+    "Authorization" : "${getAuthorizationToken()}"
   } ;
 
   Response    response = await get(url, headers: headers) ;
@@ -17,28 +18,27 @@ Future<List<Favorite>>    getFavorites() async {
   return favorites ;
 }
 
-Future<String>        addToFavorites(int toAddId) async {
+Future<List<dynamic>>        addToFavorites(int toAddId) async {
   String    url = BASE_URL + "favs/add/" + toAddId.toString() ;
   Map<String, String> headers = {
-    "Authorization" : "6d60e931-856c-4927-bca2-344be1cfe135"
+    "Authorization" : "${getAuthorizationToken()}"
   } ;
 
-  Response    response = await post(url, headers: headers);
+  Response              response = await post(url, headers: headers);
+  Map<String, dynamic>  serverResponse = jsonDecode(response.body);
 
-  return jsonDecode(response.body) ;
+  return ([serverResponse["code"], serverResponse["message"]]);
 }
 
-Future<String>        removeFromFavorites(int toRemoveId) async {
+Future<List<dynamic>>        removeFromFavorites(int toRemoveId) async {
   String url = BASE_URL + "favs/delete/" + toRemoveId.toString() ;
   print("URL = $url");
   Map<String, String> headers = {
-    "Authorization" : "6d60e931-856c-4927-bca2-344be1cfe135"
+    "Authorization" : "${getAuthorizationToken()}"
   } ;
 
-  Response    response = await delete(url, headers: headers);
+  Response              response = await delete(url, headers: headers);
+  Map<String, dynamic>  serverResponse = jsonDecode(response.body);
 
-  print("STATUS CODE = ${response.statusCode}");
-  print("DELETE FAV RESPONSE = ${response.body}");
-  print("decoded = ${jsonDecode(response.body)}");
-  return jsonDecode(response.body) ;
+  return ([serverResponse["code"], serverResponse["message"]]) ;
 }

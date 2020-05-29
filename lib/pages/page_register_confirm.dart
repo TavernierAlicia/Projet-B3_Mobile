@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:projet_b3/requests/account_requests.dart';
 import 'package:projet_b3/pages/page_main.dart';
+import 'package:projet_b3/requests/utils.dart';
 import 'package:projet_b3/singleton.dart';
 
 class PageRegisterConfirm extends StatefulWidget {
@@ -119,13 +120,14 @@ class _PageRegisterConfirmState extends State<PageRegisterConfirm> {
 
   void      _performLoginAndGoTo(MaterialPageRoute pageToGo) {
     login(widget.email, widget.password).then((value) {
-      print("In result ; should go to given route");
-      if (value != "Login or password wrong") {
+      if (value[0] as int == SERVER_RESPONSE_NO_ERROR) {
         var singletonInstance = Singleton.instance ;
-        singletonInstance.hashKey = value ;
+        singletonInstance.hashKey = value[1] as String ;
         Navigator.of(context).pushReplacement(
           pageToGo,
         );
+      } else {
+        // TODO : Show SnackBar
       }
     });
   }

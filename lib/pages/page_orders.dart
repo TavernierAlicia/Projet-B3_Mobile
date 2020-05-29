@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:projet_b3/model/bar.dart';
 import 'package:projet_b3/model/order.dart';
+import 'package:projet_b3/model/product.dart';
+import 'package:projet_b3/pages/page_cart.dart';
 import 'package:projet_b3/requests/order_requests.dart';
 import 'package:projet_b3/views/order_item.dart';
 
@@ -25,7 +28,13 @@ class _PageOrdersState extends State<PageOrders> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Mes commandes"),
+        backgroundColor: Colors.white,
+        title: Text(
+          "Mes commandes".toUpperCase(),
+          style: TextStyle(
+            color: Colors.black,
+          ),
+        ),
       ),
       body: _body(),
     );
@@ -54,12 +63,53 @@ class _PageOrdersState extends State<PageOrders> {
       physics: NeverScrollableScrollPhysics(),
       itemCount: orders.length,
       itemBuilder: (context, i) {
-        return orderItem(context, orders[i]);
+        return orderItem(context, orders[i], orderAgain: _orderAgain);
       },
     );
   }
 
-  Widget _currentOrder() {
-    return Text("");
+  void    _orderAgain(Order order) {
+
+    List<Product>    cartContent = [] ;
+
+    order.orderItems.forEach((element) {
+      cartContent.add(Product(
+        element.itemId,
+        element.name,
+        "",
+        element.price,
+        0,
+        0,
+        "",
+        quantity: element.quantity,
+      )) ;
+    });
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return PageCart(
+            cartContent: cartContent,
+            bar: Bar(
+                order.establishmentId,
+                order.establishmentName,
+                "",
+                "",
+                "",
+                0,
+                0,
+                order.pictureUrl,
+                "",
+                0,
+                "",
+                "",
+                "",
+                "",
+                ""
+            ),
+          );
+        },
+      ),
+    );
   }
 }
