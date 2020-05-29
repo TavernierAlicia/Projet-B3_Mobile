@@ -206,7 +206,7 @@ class _PageLoginState extends State<PageLogin> {
     if (_loginController.text.isEmpty || _passwordController.text.isEmpty)
       return ;
     login(_loginController.text, _passwordController.text).then((value) {
-      if (value[0] as int != SERVER_RESPONSE_NO_ERROR) {
+      if (value[0] as int == SERVER_RESPONSE_NO_ERROR) {
         saveUserToken(value[1] as String).then((value) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(

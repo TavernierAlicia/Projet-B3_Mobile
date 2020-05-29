@@ -127,7 +127,11 @@ class _PageRegisterConfirmState extends State<PageRegisterConfirm> {
           pageToGo,
         );
       } else {
-        // TODO : Show SnackBar
+        Scaffold.of(context).showSnackBar(
+          SnackBar(
+            content: Text(getServerErrorMessage(value[0] as int)),
+          ),
+        );
       }
     });
   }
