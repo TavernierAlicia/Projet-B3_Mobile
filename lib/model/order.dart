@@ -6,6 +6,7 @@ class Order {
       String pictureUrl, String date, double totalPrice, String status,
       List<OrderItem> orderItems,) {
 
+    print("DEFAULT CONSTRUCTOR ID = $id");
     this.id = id ;
     this.establishmentId = establishmentId ;
     this.establishmentName = establishmentName ;
@@ -21,18 +22,16 @@ class Order {
       List<OrderItem> orderItems, int establishmentStreetNum,
       String establishmentStreetName, String establishmentCity) {
     this.establishmentStreetNum = establishmentStreetNum ;
-    this.establishmentStreetName = establishmentName ;
+    this.establishmentStreetName = establishmentStreetName ;
     this.establishmentCity = establishmentCity ;
-    Order(
-      id,
-      establishmentId,
-      establishmentName,
-      pictureUrl,
-      date,
-      totalPrice,
-      status,
-      orderItems
-    );
+    this.id = id ;
+    this.establishmentId = establishmentId ;
+    this.establishmentName = establishmentName ;
+    this.pictureUrl = pictureUrl ;
+    this.date = date ;
+    this.totalPrice = totalPrice.toDouble() ;
+    this.status = status ;
+    this.orderItems = orderItems ;
   }
 
   factory Order.fromJson(Map<String, dynamic> jsonMap) {
