@@ -71,6 +71,7 @@ class _PageRegisterState extends State<PageRegister> {
                           "Entrez votre email",
                           _emailValidator,
                           _emailController,
+                          textInputType: TextInputType.emailAddress,
                         ),
                         _birthDatePicker(),
                         formItem(
@@ -95,6 +96,7 @@ class _PageRegisterState extends State<PageRegister> {
                           "Numero de telephone",
                           _phoneNumberValidator,
                           _phoneController,
+                          textInputType: TextInputType.number,
                         ),
                       ],
                     ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 Widget    formItem(BuildContext context, String title, String hint, validator,
     TextEditingController controller,
-    { obscureText = false }) {
+    { obscureText = false, textInputType = TextInputType.text }) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
@@ -18,6 +18,7 @@ Widget    formItem(BuildContext context, String title, String hint, validator,
         obscureText: obscureText,
         controller: controller,
         textInputAction: TextInputAction.next,
+        keyboardType: textInputType,
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.grey[200],

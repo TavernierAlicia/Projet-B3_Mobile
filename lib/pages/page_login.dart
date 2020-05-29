@@ -88,6 +88,7 @@ class _PageLoginState extends State<PageLogin> {
                   "Entrez l'identifiant",
                   _basicValidator,
                   _loginController,
+                  textInputType: TextInputType.emailAddress,
                 ),
                 formItem(
                   context,
