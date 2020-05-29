@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:projet_b3/model/order.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:projet_b3/pages/page_order.dart';
 
 Widget orderItem(context, Order order, { orderAgain(Order order) }) {
 
@@ -11,62 +12,71 @@ Widget orderItem(context, Order order, { orderAgain(Order order) }) {
 
   return Padding(
     padding: EdgeInsets.only(left: 15, top: 15, right: 15),
-    child: Card(
-      elevation: 10,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10)
-      ),
-      child: Padding(
-        padding: EdgeInsets.only(top: 15),
-        child: Column(
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.all(15),
-                  child: Container(
-                    width: _screenWidth / 4,
-                    height: _screenWidth / 4,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                            fit: BoxFit.fill,
-                            image: NetworkImage(order.pictureUrl)
-                        )
+    child: InkWell(
+      onTap: (() {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => PageOrder(order: order)
+          )
+        );
+      }),
+      child: Card(
+        elevation: 10,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10)
+        ),
+        child: Padding(
+          padding: EdgeInsets.only(top: 15),
+          child: Column(
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.all(15),
+                    child: Container(
+                      width: _screenWidth / 4,
+                      height: _screenWidth / 4,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                              fit: BoxFit.fill,
+                              image: NetworkImage(order.pictureUrl)
+                          )
+                      ),
                     ),
                   ),
-                ),
-                Flexible(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        order.establishmentName.toUpperCase(),
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        DateFormat.yMMMd('fr_FR').format(DateTime.parse(order.date)),
-                        style: TextStyle(
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          order.establishmentName.toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 17,
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey
+                          ),
                         ),
-                      ),
-                      Text(
-                        _createProductsList(order),
-                        style: TextStyle(
-                          fontSize: 16,
+                        Text(
+                          DateFormat.yMMMd('fr_FR').format(DateTime.parse(order.date)),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey
+                          ),
                         ),
-                      ),
-                    ],
+                        Text(
+                          _createProductsList(order),
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-            _orderAgainButton(order, context, orderAgain),
-          ],
+                ],
+              ),
+              _orderAgainButton(order, context, orderAgain),
+            ],
+          ),
         ),
       ),
     ),
