@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:projet_b3/colors.dart';
 import 'package:projet_b3/pages/page_main.dart';
 import 'package:projet_b3/pages/page_register.dart';
+import 'package:projet_b3/requests/utils.dart';
 import 'package:projet_b3/singleton.dart';
 import 'package:projet_b3/user_data.dart';
 import 'package:projet_b3/requests/account_requests.dart';
@@ -202,8 +203,8 @@ class _PageLoginState extends State<PageLogin> {
     if (_loginController.text.isEmpty || _passwordController.text.isEmpty)
       return ;
     login(_loginController.text, _passwordController.text).then((value) {
-      if (value != "Login or password wrong") {
-        saveUserToken(value).then((value) {
+      if (value[0] as int != SERVER_RESPONSE_NO_ERROR) {
+        saveUserToken(value[1] as String).then((value) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => MainPage(),
@@ -213,7 +214,7 @@ class _PageLoginState extends State<PageLogin> {
       } else {
         Scaffold.of(_scaffoldContext).showSnackBar(
           SnackBar(
-            content: Text("Wrong login or password."),
+            content: Text(getServerErrorMessage(value[0] as int)),
           ),
         );
       }

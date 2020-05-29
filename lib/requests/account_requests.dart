@@ -28,14 +28,14 @@ Future<int>       createUser(String firstName, String name, String mail,
   }
   """;
 
-  Response    response = await post(url, body: jsonBody);
-  Map<String, dynamic> serverResponse = convert.jsonDecode(response.body);
+  Response              response = await post(url, body: jsonBody);
+  Map<String, dynamic>  serverResponse = convert.jsonDecode(response.body);
   return (serverResponse["code"] as int);
 }
 
 /// Hash the users [password] value and send a request to the server to get an
 /// authorization token.
-Future<String>      login(String email, String password) async {
+Future<List<dynamic>>        login(String email, String password) async {
   String    url = BASE_URL + "auth/" ;
   Digest    encryptedPassword = sha256.convert(convert.utf8.encode(password));
   String    jsonBody = """
@@ -45,11 +45,9 @@ Future<String>      login(String email, String password) async {
     }
   """ ;
 
-  Response      response = await post(url, body: jsonBody);
-  print("RESPONSE STATUS CODE = ${response.statusCode}");
-  print("RESPONSE HEADERS = ${response.headers}");
-  print("RESPONSE BODY = ${response.body}");
-  return (convert.jsonDecode(response.body)) ;
+  Response              response = await post(url, body: jsonBody);
+  Map<String, dynamic>  serverResponse = convert.jsonDecode(response.body);
+  return ([serverResponse["code"], serverResponse["message"] as String]) ;
 }
 
 /*
