@@ -17,7 +17,9 @@ Future<String>  takeOrder(int barId, List<Product> cartContent, int arrivingIn,
   } ;
 
   List<int> products = [] ;
+  print("In takeOrder request ; cartContent has ${cartContent.length} elements");
   cartContent.forEach((element) {
+    print("In takeOrder cartContent for loop, element ${element.name} has quantity ${element.quantity}");
     for (var i = 0 ; i < element.quantity ; i++) {
       products.add(element.id);
     }
@@ -52,8 +54,25 @@ Future<List<Order>>     getOrdersHistory() async {
   } ;
 
   Response    response = await get(url, headers: headers) ;
+  print("Response status code = ${response.statusCode}");
+  print("Response body = ${response.body}");
   var data = jsonDecode(response.body) as List;
   var ordersList = data.map<Order>((json) => Order.fromJson(json)).toList();
 
   return ordersList ;
+}
+
+Future<Order>           getOrderDetails(int orderId) async {
+  String        url = BASE_URL + "getOrder/" + orderId.toString() ;
+  Map<String, String>   headers = {
+    "Authorization" : "${getAuthorizationToken()}"
+  };
+
+  Response      response = await get(url, headers: headers) ;
+  var           data = jsonDecode(response.body) as List; // TODO : Unset list in server
+  print("Response status code = ${response.statusCode}");
+  print("Response body = ${response.body}");
+  var order = data.map<Order>((json) => Order.detailsFromJson(json)).toList();
+
+  return order[0] ;
 }

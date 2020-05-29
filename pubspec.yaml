@@ -68,6 +68,8 @@ flutter:
     - assets/add.png
     - assets/cb.png
     - assets/circle.png
+    - assets/circular_arrow.png
+    - assets/download.png
     - assets/edit.png
     - assets/facebook.png
     - assets/favorite_empty.png
