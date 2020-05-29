@@ -1,4 +1,5 @@
 
+import 'package:flutter/material.dart';
 import 'package:projet_b3/singleton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -25,3 +26,13 @@ String        getAuthorizationToken() {
   return singletonInstance.hashKey ;
 }
 
+/// Displays a SnackBar on the Scaffold of the [context] to inform the user that
+/// the feature is not implemented yet.
+void          showFeatureNotReadySnackBar(BuildContext context) {
+  Scaffold.of(context).showSnackBar(
+    SnackBar(
+      content: Text("Désolé, cette fonctionnalité n'est pas encore disponible."),
+      duration: Duration(seconds: 2),
+    ),
+  );
+}

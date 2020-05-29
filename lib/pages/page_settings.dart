@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../utils.dart';
+
 class PageSettings extends StatefulWidget {
   PageSettings({Key key}) : super(key: key);
 
@@ -115,6 +117,7 @@ class _PageSettingsState extends State<PageSettings> {
         InkWell(
           onTap: (() {
             // TODO
+            showFeatureNotReadySnackBar(context);
           }),
           child: Text(
             "FAQ",
@@ -127,6 +130,7 @@ class _PageSettingsState extends State<PageSettings> {
         InkWell(
           onTap: (() {
             // TODO
+            showFeatureNotReadySnackBar(context);
           }),
           child: Text(
             "Service Client",
@@ -154,6 +158,7 @@ class _PageSettingsState extends State<PageSettings> {
         InkWell(
           onTap: (() {
             // TODO
+            showFeatureNotReadySnackBar(context);
           }),
           child: Text(
             "Mentions légales",
@@ -170,6 +175,7 @@ class _PageSettingsState extends State<PageSettings> {
     return InkWell(
         onTap: (() {
           // TODO : Logout
+          showFeatureNotReadySnackBar(context);
           print("Should logout");
         }),
         child: Text(
@@ -183,14 +189,7 @@ class _PageSettingsState extends State<PageSettings> {
   }
 
   void      _changeAppTheme() {
-    Scaffold.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          "Désolé, cette fonctionnalité n'est pas encore disponible.",
-        ),
-        duration: Duration(seconds: 2),
-      ),
-    );
+    showFeatureNotReadySnackBar(context);
     Timer(Duration(seconds: 2), (() {
       setState(() {
         _usesDarkMode = false ;
