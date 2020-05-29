@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:projet_b3/model/bar.dart';
 import 'package:projet_b3/model/product.dart';
 import 'package:projet_b3/pages/page_cart.dart';
+import 'package:projet_b3/pages/page_order.dart';
 import 'package:projet_b3/requests/order_requests.dart';
 
 class   PageTakeOrder extends StatefulWidget {
@@ -106,7 +107,12 @@ class _PageTakeOrderState extends State<PageTakeOrder> {
           Padding(padding: EdgeInsets.all(20),),
           InkWell(
             onTap: (() {
-              // TODO
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => PageOrder()   // TODO : Give order id
+                ),
+                ((route) => route.isFirst),
+              );
             }),
             child: Padding(
               padding: EdgeInsets.only(left: 50, right: 50),
@@ -138,7 +144,6 @@ class _PageTakeOrderState extends State<PageTakeOrder> {
           Padding(padding: EdgeInsets.all(10),),
           InkWell(
             onTap: (() {
-              // TODO
               Navigator.of(context).popUntil((route) => route.isFirst);
             }),
             child: Padding(
