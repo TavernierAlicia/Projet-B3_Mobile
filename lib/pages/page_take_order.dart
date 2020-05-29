@@ -139,6 +139,7 @@ class _PageTakeOrderState extends State<PageTakeOrder> {
           InkWell(
             onTap: (() {
               // TODO
+              Navigator.of(context).popUntil((route) => route.isFirst);
             }),
             child: Padding(
               padding: EdgeInsets.only(left: 50, right: 50),

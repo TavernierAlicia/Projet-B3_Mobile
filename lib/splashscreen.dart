@@ -1,9 +1,9 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:projet_b3/singleton.dart';
 import 'package:projet_b3/utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatelessWidget {
 
@@ -13,6 +13,8 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    Size    _screenSize = window.physicalSize ;
 
     retrieveAuthorizationToken().then((value) {
       print("VALUE = $value");
@@ -26,17 +28,23 @@ class SplashScreen extends StatelessWidget {
     return Material(
       child: Container(
         color: Colors.deepOrange,
-        child: Column(
-          children: <Widget>[
-            Image.asset(
-              "assets/logo.png",
-              scale: 1.5,
-            ),
-            CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation(Colors.white),
-            ),
-          ],
-        ),
+        width: _screenSize.width,
+        height: _screenSize.height,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Image.asset(
+                "assets/logo.png",
+                scale: 1.5,
+              ),
+              CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation(Colors.white),
+              ),
+            ],
+          ),
+        )
       ),
     );
   }
