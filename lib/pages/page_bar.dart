@@ -5,6 +5,7 @@ import 'package:projet_b3/model/product.dart';
 import 'package:projet_b3/pages/page_cart.dart';
 import 'package:projet_b3/requests/bar_requests.dart';
 import 'package:projet_b3/requests/favorite_requests.dart';
+import 'package:projet_b3/requests/utils.dart';
 import 'package:projet_b3/views/bar_header.dart';
 import 'package:projet_b3/views/product_item.dart';
 
@@ -211,13 +212,20 @@ class _PageBarState extends State<PageBar> {
 
     if (barInfo.barDetails.isFavorite) {
       removeFromFavorites(barInfo.barDetails.id).then((value) {
-        if (value == "deleted")
+        if (value[0] == SERVER_RESPONSE_NO_ERROR)
           _updateFavoritesUI() ;
       });
     } else {
       addToFavorites(barInfo.barDetails.id).then((value) {
-        if (value == "Added!")
+        if (value[0] == SERVER_RESPONSE_NO_ERROR)
           _updateFavoritesUI() ;
+        else {
+          Scaffold.of(context).showSnackBar(
+            SnackBar(
+              content: Text(getServerErrorMessage(value[0])),
+            ),
+          );
+        }
       });
     }
   }
