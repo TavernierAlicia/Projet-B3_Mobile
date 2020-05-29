@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:projet_b3/pages/page_login.dart';
 
+import '../singleton.dart';
 import '../utils.dart';
 
 class PageSettings extends StatefulWidget {
@@ -174,9 +176,7 @@ class _PageSettingsState extends State<PageSettings> {
   Widget    _logoutButton() {
     return InkWell(
         onTap: (() {
-          // TODO : Logout
-          showFeatureNotReadySnackBar(context);
-          print("Should logout");
+          _performLogout();
         }),
         child: Text(
           "Déconnexion".toUpperCase(),
@@ -195,5 +195,19 @@ class _PageSettingsState extends State<PageSettings> {
         _usesDarkMode = false ;
       });
     }));
+  }
+
+  /// Remove the user token from the Singleton and from the Shared Preferences,
+  /// then go to Login Page.
+  void      _performLogout() {
+    var singletonInstance = Singleton.instance ;
+    singletonInstance.hashKey = "" ;
+    forgetUserToken().then((value) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => PageLogin(),
+        ),
+      );
+    });
   }
 }
