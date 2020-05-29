@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:projet_b3/model/bar.dart';
 import 'package:projet_b3/model/order.dart';
+import 'package:projet_b3/model/product.dart';
+import 'package:projet_b3/pages/page_cart.dart';
 import 'package:projet_b3/requests/order_requests.dart';
 import 'package:projet_b3/utils.dart';
 
@@ -277,9 +280,55 @@ class _PageOrderState extends State<PageOrder> {
             ],
           ),
           onPressed: (() {
-            showFeatureNotReadySnackBar(context);
+            _orderAgain(_orderDetails);
           }),
         ),
+      ),
+    );
+  }
+
+  void    _orderAgain(Order order) {
+
+    List<Product>    cartContent = [] ;
+
+    order.orderItems.forEach((element) {
+      print("in order items for loop ; element ${element.name} has quantity ${element.quantity}");
+      cartContent.add(Product(
+        element.itemId,
+        element.name,
+        "",
+        element.price,
+        0,
+        0,
+        "",
+        quantity: element.quantity,
+      )) ;
+    });
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return PageCart(
+            cartContent: cartContent,
+            bar: Bar(
+                order.establishmentId,
+                order.establishmentName,
+                "",
+                "",
+                "",
+                0,
+                0,
+                order.pictureUrl,
+                "",
+                order.establishmentStreetNum,
+                order.establishmentStreetName,
+                order.establishmentCity,
+                "",
+                "",
+                ""
+            ),
+          );
+        },
       ),
     );
   }

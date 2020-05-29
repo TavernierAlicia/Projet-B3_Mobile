@@ -17,7 +17,9 @@ Future<String>  takeOrder(int barId, List<Product> cartContent, int arrivingIn,
   } ;
 
   List<int> products = [] ;
+  print("In takeOrder request ; cartContent has ${cartContent.length} elements");
   cartContent.forEach((element) {
+    print("In takeOrder cartContent for loop, element ${element.name} has quantity ${element.quantity}");
     for (var i = 0 ; i < element.quantity ; i++) {
       products.add(element.id);
     }
