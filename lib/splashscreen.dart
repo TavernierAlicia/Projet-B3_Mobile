@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:projet_b3/singleton.dart';
 import 'package:projet_b3/utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatelessWidget {
 
@@ -13,14 +12,16 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     retrieveAuthorizationToken().then((value) {
       print("VALUE = $value");
       if (value != null) {
         var singletonInstance = Singleton.instance ;
         singletonInstance.hashKey = value ;
       }
-      completer.complete(value != null) ;
+      Timer(Duration(seconds: 5), (() {
+        print("TIMER FINISHED !");
+        completer.complete(value != null) ;
+      }));
     });
 
     return Material(
