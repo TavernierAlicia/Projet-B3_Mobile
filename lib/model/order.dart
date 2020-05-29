@@ -4,7 +4,7 @@ class Order {
 
   Order(int id, int establishmentId, String establishmentName,
       String pictureUrl, String date, double totalPrice, String status,
-      List<OrderItem> orderItems) {
+      List<OrderItem> orderItems,) {
 
     this.id = id ;
     this.establishmentId = establishmentId ;
@@ -14,6 +14,25 @@ class Order {
     this.totalPrice = totalPrice.toDouble() ;
     this.status = status ;
     this.orderItems = orderItems ;
+  }
+
+  Order.details(int id, int establishmentId, String establishmentName,
+      String pictureUrl, String date, double totalPrice, String status,
+      List<OrderItem> orderItems, int establishmentStreetNum,
+      String establishmentStreetName, String establishmentCity) {
+    this.establishmentStreetNum = establishmentStreetNum ;
+    this.establishmentStreetName = establishmentName ;
+    this.establishmentCity = establishmentCity ;
+    Order(
+      id,
+      establishmentId,
+      establishmentName,
+      pictureUrl,
+      date,
+      totalPrice,
+      status,
+      orderItems
+    );
   }
 
   factory Order.fromJson(Map<String, dynamic> jsonMap) {
@@ -44,6 +63,38 @@ class Order {
     );
   }
 
+  factory   Order.detailsFromJson(Map<String, dynamic> jsonMap) {
+    List<OrderItem>   _orderItems = [] ;
+
+    print("Order.detailsFromJson");
+
+    var commandItems = jsonMap["CmdItems"] as List ;
+    _orderItems =
+        commandItems.map<OrderItem>((json) => OrderItem.fromJson(json))
+            .toList();
+
+    print("ORDER ITEM PARSING OVER");
+    _orderItems.forEach((element) {
+      print("NEW ORDER ITEM : ${element.name}");
+    });
+
+    var command = jsonMap["Cmd"] ;
+
+    return Order.details(
+      command["Id"],
+      command["Etab_id"],
+      command["Etab_name"],
+      command["Pic"],
+      command["Date"],
+      double.tryParse(command["Price"].toString()),
+      command["Status"],
+      _orderItems,
+      command["EtabStreetNum"],
+      command["EtabStreetName"],
+      command["EtabCity"],
+    );
+  }
+
   int             id ;
   int             establishmentId ;
   String          establishmentName ;
@@ -52,6 +103,9 @@ class Order {
   double          totalPrice ;
   String          status ;
   List<OrderItem> orderItems ;
+  int             establishmentStreetNum ;
+  String          establishmentStreetName ;
+  String          establishmentCity ;
 }
 
 class   OrderItem {

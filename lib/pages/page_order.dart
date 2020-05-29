@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:projet_b3/model/order.dart';
+import 'package:projet_b3/requests/order_requests.dart';
 
 class PageOrder extends StatefulWidget {
   PageOrder({Key key, this.order}) : super(key: key);
@@ -11,6 +12,14 @@ class PageOrder extends StatefulWidget {
 }
 
 class _PageOrderState extends State<PageOrder> {
+
+  Future<Order>     _orderDetails ;
+
+  @override
+  void initState() {
+    _orderDetails = getOrderDetails(widget.order.id) ;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +42,19 @@ class _PageOrderState extends State<PageOrder> {
   }
 
   Widget    _body() {
-    return Column();
+    return FutureBuilder(
+      future: _orderDetails,
+      builder: (context, snapshot) {
+        return (snapshot.hasData)
+            ? Column(
+          children: <Widget>[
+
+          ],
+        )
+            : Center(
+          child: CircularProgressIndicator(),
+        ) ;
+      },
+    );
   }
 }

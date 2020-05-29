@@ -52,8 +52,25 @@ Future<List<Order>>     getOrdersHistory() async {
   } ;
 
   Response    response = await get(url, headers: headers) ;
+  print("Response status code = ${response.statusCode}");
+  print("Response body = ${response.body}");
   var data = jsonDecode(response.body) as List;
   var ordersList = data.map<Order>((json) => Order.fromJson(json)).toList();
 
   return ordersList ;
+}
+
+Future<Order>           getOrderDetails(int orderId) async {
+  String        url = BASE_URL + "getOrder/" + orderId.toString() ;
+  Map<String, String>   headers = {
+    "Authorization" : "${getAuthorizationToken()}"
+  };
+
+  Response      response = await get(url, headers: headers) ;
+  var           data = jsonDecode(response.body) as List; // TODO : Unset list in server
+  print("Response status code = ${response.statusCode}");
+  print("Response body = ${response.body}");
+  var order = data.map<Order>((json) => Order.detailsFromJson(json)).toList();
+
+  return order[0] ;
 }
