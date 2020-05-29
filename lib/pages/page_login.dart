@@ -83,12 +83,14 @@ class _PageLoginState extends State<PageLogin> {
             child: Column(
               children: <Widget>[
                 formItem(
+                  context,
                   "Identifiant",
                   "Entrez l'identifiant",
                   _basicValidator,
                   _loginController,
                 ),
                 formItem(
+                  context,
                   "Mot de passe",
                   "Entrez le mot de passe",
                   _basicValidator,
