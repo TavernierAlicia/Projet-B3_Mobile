@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:projet_b3/model/bar_info.dart';
 import 'package:projet_b3/model/favorite.dart';
 import 'package:projet_b3/requests/utils.dart';
 import 'package:http/http.dart';

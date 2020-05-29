@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:projet_b3/pages/page_login.dart';
+import 'package:projet_b3/pages/page_profile.dart';
 
 import '../singleton.dart';
 import '../utils.dart';
@@ -53,8 +54,11 @@ class _PageSettingsState extends State<PageSettings> {
   Widget    _profileButton() {
     return InkWell(
         onTap: (() {
-          // TODO : Go to profile
-          print("Should go to profile");
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => PageProfile(),
+            ),
+          );
         }),
         child: Wrap(
           children: <Widget>[
