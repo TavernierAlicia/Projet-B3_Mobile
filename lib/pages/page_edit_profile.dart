@@ -16,14 +16,16 @@ class _PageEditProfileState extends State<PageEditProfile> {
 
   Size            _screenSize ;
   BuildContext    _scaffoldContext ;
+  final           _formKey = GlobalKey<FormState>() ;
+  final           _passwordFormKey = GlobalKey<FormState>() ;
 
-  TextEditingController   _nameEditingController = TextEditingController();
-  TextEditingController   _surnameEditingController = TextEditingController();
-  TextEditingController   _emailEditingController = TextEditingController();
-  TextEditingController   _phoneEditingController = TextEditingController();
-  TextEditingController   _birthDayController = TextEditingController();
-  TextEditingController   _passwordEditingController = TextEditingController();
-  TextEditingController   _newPasswordEditingController = TextEditingController();
+  final TextEditingController   _nameEditingController = TextEditingController();
+  final TextEditingController   _surnameEditingController = TextEditingController();
+  final TextEditingController   _emailEditingController = TextEditingController();
+  final TextEditingController   _phoneEditingController = TextEditingController();
+  final TextEditingController   _birthDayController = TextEditingController();
+  final TextEditingController   _passwordEditingController = TextEditingController();
+  final TextEditingController   _newPasswordEditingController = TextEditingController();
 
   Profile         _profile ;
 
@@ -97,13 +99,27 @@ class _PageEditProfileState extends State<PageEditProfile> {
                 ),
               ],
             ),
-            _textFormField(_nameEditingController, false),
-            _textFormField(_surnameEditingController, false),
-            _textFormField(_emailEditingController, false),
-            _textFormField(_phoneEditingController, true),
-            _birthDatePicker(),
-            _passwordTextFormField(_passwordEditingController, "Mot de passe", false),
-            _passwordTextFormField(_newPasswordEditingController, "Nouveau mot de passe", true),
+            Form(
+              key: _formKey,
+              child: Column(
+                children: <Widget>[
+                  _textFormField(_nameEditingController, basicValidator, false),
+                  _textFormField(_surnameEditingController, basicValidator, false),
+                  _textFormField(_emailEditingController, emailValidator, false),
+                  _textFormField(_phoneEditingController, phoneNumberValidator, true),
+                  _birthDatePicker(),
+                ],
+              ),
+            ),
+            Form(
+              key: _passwordFormKey,
+              child: Column(
+                children: <Widget>[
+                  _passwordTextFormField(_passwordEditingController, passwordValidator, "Mot de passe", false),
+                  _passwordTextFormField(_newPasswordEditingController, passwordValidator, "Nouveau mot de passe", true),
+                ],
+              ),
+            ),
             Padding(
               padding: EdgeInsets.only(top: 20, bottom: 20),
               child: _editProfileButton(),
@@ -114,7 +130,7 @@ class _PageEditProfileState extends State<PageEditProfile> {
     );
   }
 
-  Widget  _textFormField(TextEditingController controller, bool isLastField) {
+  Widget  _textFormField(TextEditingController controller, validator, bool isLastField) {
     return TextFormField(
       initialValue: controller.value.text,
       textInputAction: (isLastField) ? TextInputAction.done : TextInputAction.next,
@@ -126,6 +142,9 @@ class _PageEditProfileState extends State<PageEditProfile> {
             )
         ),
       ),
+      validator: ((value) {
+        return (validator(value)) ;
+      }),
       onFieldSubmitted: ((v) {
         if (!isLastField) FocusScope.of(context).nextFocus();
         else FocusScope.of(context).unfocus();
@@ -187,7 +206,8 @@ class _PageEditProfileState extends State<PageEditProfile> {
     );
   }
 
-  Widget  _passwordTextFormField(TextEditingController controller, String title, bool isLastField) {
+  Widget  _passwordTextFormField(TextEditingController controller, validator,
+      String title, bool isLastField) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -199,6 +219,7 @@ class _PageEditProfileState extends State<PageEditProfile> {
         TextFormField(
           textInputAction: (isLastField) ? TextInputAction.done : TextInputAction.next,
           keyboardType: TextInputType.visiblePassword,
+          obscureText: true,
           decoration: InputDecoration(
             border: UnderlineInputBorder(
                 borderSide: BorderSide(
@@ -206,6 +227,9 @@ class _PageEditProfileState extends State<PageEditProfile> {
                 )
             ),
           ),
+          validator: ((value) {
+            return (validator(value));
+          }),
           onChanged: ((value) {
             controller.text = value ;
           }),
@@ -235,19 +259,27 @@ class _PageEditProfileState extends State<PageEditProfile> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        onPressed: (() {
-          Map newProfileValues = _buildMapProfile() ;
-          if (newProfileValues.isNotEmpty)
-            editUserProfile(newProfileValues);
-          else
-            Scaffold.of(_scaffoldContext).showSnackBar(
-              SnackBar(
-                content: Text("Vous devez modifier au moins un champ !"),
-              ),
-            );
-        }),
+        onPressed: () => _editProfile(),
       ),
     );
+  }
+
+  void  _editProfile() {
+    if (!_formKey.currentState.validate())
+      return ;
+    if (_newPasswordEditingController.text.isNotEmpty
+        && !_passwordFormKey.currentState.validate())
+      return ;
+
+    Map newProfileValues = _buildMapProfile() ;
+    if (newProfileValues.isNotEmpty)
+      editUserProfile(newProfileValues);
+    else
+      Scaffold.of(_scaffoldContext).showSnackBar(
+        SnackBar(
+          content: Text("Vous devez modifier au moins un champ !"),
+        ),
+      );
   }
 
   Map   _buildMapProfile() {

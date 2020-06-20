@@ -70,7 +70,7 @@ class _PageRegisterState extends State<PageRegister> {
                           context,
                           "Email",
                           "Entrez votre email",
-                          _emailValidator,
+                          emailValidator,
                           _emailController,
                           textInputType: TextInputType.emailAddress,
                         ),
@@ -79,7 +79,7 @@ class _PageRegisterState extends State<PageRegister> {
                           context,
                           "Mot de passe",
                           "Entrez votre mot de passe",
-                          _passwordValidator,
+                          passwordValidator,
                           _passwordController,
                           obscureText: true,
                         ),
@@ -87,7 +87,7 @@ class _PageRegisterState extends State<PageRegister> {
                           context,
                           "Confirmez mot de passe",
                           "Confirmez votre mot de passe",
-                          _passwordConfirmValidator,
+                          passwordConfirmValidator,
                           _confPassController,
                           obscureText: true,
                         ),
@@ -95,7 +95,7 @@ class _PageRegisterState extends State<PageRegister> {
                           context,
                           "Numero de telephone",
                           "Numero de telephone",
-                          _phoneNumberValidator,
+                          phoneNumberValidator,
                           _phoneController,
                           textInputType: TextInputType.number,
                         ),
@@ -111,48 +111,6 @@ class _PageRegisterState extends State<PageRegister> {
         },
       ),
     );
-  }
-
-  String    _emailValidator(String value) {
-    Pattern   pattern = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$' ;
-    RegExp    regex = RegExp(pattern);
-
-    if (value.isEmpty)
-      return ("Ce champ est obligatoire") ;
-    else if (!regex.hasMatch(value))
-      return ("Cet email est invalide.") ;
-    else
-      return (null) ;
-  }
-
-  String    _passwordValidator(String value) {
-    if (value.isEmpty)
-      return ("Ce champ est obligatoire.");
-    else if (value.length < 8)
-      return ("Votre mot de passe doit faire au moins 8 caracteres.");
-    else
-      return (null) ;
-  }
-
-  String    _passwordConfirmValidator(String value) {
-    if (value.isEmpty)
-      return ("Ce champ est obligatoire.");
-    else if (value != _passwordController.text)
-      return ("Les mots de passe ne correspondent pas.}");
-    else
-      return (null) ;
-  }
-
-  String    _phoneNumberValidator(String value) {
-    Pattern   pattern = r'^(?:[+0]9)?[0-9]{10}$' ;
-    RegExp    regex = RegExp(pattern);
-
-    if (value.isEmpty)
-      return "Ce champ est obligatoire.";
-    else if (value.length < 10 || !regex.hasMatch(value))
-      return ("Ce numero est invalide.");
-    else
-      return (null) ;
   }
 
   Widget    _birthDatePicker() {
