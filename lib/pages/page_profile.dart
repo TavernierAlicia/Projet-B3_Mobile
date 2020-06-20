@@ -13,6 +13,7 @@ class PageProfile extends StatefulWidget {
 class _PageProfileState extends State<PageProfile> {
 
   Size              _screenSize ;
+  BuildContext      _scaffoldContext ;
 
   Future<Profile>   _userProfileFuture ;
   Profile           _userProfile ;
@@ -49,6 +50,7 @@ class _PageProfileState extends State<PageProfile> {
       body: FutureBuilder(
         future: _userProfileFuture,
         builder: (context, snapshot) {
+          _scaffoldContext = context ;
           if (snapshot.data != null) {
             _userProfile = snapshot.data as Profile ;
             return _profileBody() ;
@@ -156,15 +158,28 @@ class _PageProfileState extends State<PageProfile> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        onPressed: (() {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => PageEditProfile(profile: _userProfile,)
-            ),
-          );
-        }),
+        onPressed: () => _goToEditProfile(),
       ),
     );
+  }
+
+  void      _goToEditProfile() async {
+    final bool result = await Navigator.of(context).push(
+      MaterialPageRoute(
+          builder: (context) => PageEditProfile(profile: _userProfile,)
+      ),
+    );
+    if (result != null && result == true)
+      Scaffold.of(_scaffoldContext).showSnackBar(
+        SnackBar(
+          content: Text("Votre profil a été modifié !"),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    // TODO : Reload (get the user profile again)
+    setState(() {
+      _userProfileFuture = getUserProfile() ;
+    });
   }
 
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:projet_b3/model/profile.dart';
 import 'package:projet_b3/requests/profile_requests.dart';
@@ -16,6 +18,7 @@ class _PageEditProfileState extends State<PageEditProfile> {
 
   Size            _screenSize ;
   BuildContext    _scaffoldContext ;
+  bool            _isButtonEnabled = true ;
   final           _formKey = GlobalKey<FormState>() ;
   final           _passwordFormKey = GlobalKey<FormState>() ;
 
@@ -115,8 +118,10 @@ class _PageEditProfileState extends State<PageEditProfile> {
               key: _passwordFormKey,
               child: Column(
                 children: <Widget>[
-                  _passwordTextFormField(_passwordEditingController, passwordValidator, "Mot de passe", false),
-                  _passwordTextFormField(_newPasswordEditingController, passwordValidator, "Nouveau mot de passe", true),
+                  _passwordTextFormField(_passwordEditingController,
+                    passwordValidator, "Mot de passe", false,),
+                  _passwordTextFormField(_newPasswordEditingController,
+                    passwordValidator, "Nouveau mot de passe", true,),
                 ],
               ),
             ),
@@ -130,10 +135,13 @@ class _PageEditProfileState extends State<PageEditProfile> {
     );
   }
 
-  Widget  _textFormField(TextEditingController controller, validator, bool isLastField) {
+  Widget  _textFormField(TextEditingController controller, validator,
+      bool isLastField) {
     return TextFormField(
       initialValue: controller.value.text,
-      textInputAction: (isLastField) ? TextInputAction.done : TextInputAction.next,
+      textInputAction: (isLastField)
+          ? TextInputAction.done
+          : TextInputAction.next,
       keyboardType: TextInputType.text,
       decoration: InputDecoration(
         border: UnderlineInputBorder(
@@ -156,14 +164,12 @@ class _PageEditProfileState extends State<PageEditProfile> {
     );
   }
 
-  /// Create the birthDatePicker. As we need to change the state of the
-  ///   TextFormField, we need to create a StatefulBuilder.
+  /// Create the birth date field and the related [DatePicker]. As we need to
+  /// change the state of the [TextFormField], we need to create a
+  /// [StatefulBuilder].
   Widget    _birthDatePicker() {
     return StatefulBuilder(
         builder: (BuildContext birthDayContext, StateSetter birthDaySetState) {
-
-          String birthDate = _profile.birth ;
-
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -183,19 +189,15 @@ class _PageEditProfileState extends State<PageEditProfile> {
                   ),
                 ),
                 onTap: (() {
-                  print("Should open datePicker");
                   showDatePicker(
                     context: birthDayContext,
                     initialDate: DateTime(1990),
                     firstDate: DateTime(1970),
                     lastDate: DateTime(DateTime.now().year - 18),
                   ).then((value) {
-                    print("VALUE = $value") ;
                     if (value == null) return ;
                     birthDaySetState(() {
                       _birthDayController.text = "${value.year}-${value.month}-${value.day}" ;
-                      birthDate = "test" ;
-                      print("birthDayController text = ${_birthDayController.text} | birthDate = $birthDate");
                     });
                   });
                 }),
@@ -217,7 +219,9 @@ class _PageEditProfileState extends State<PageEditProfile> {
           textAlign: TextAlign.left,
         ),
         TextFormField(
-          textInputAction: (isLastField) ? TextInputAction.done : TextInputAction.next,
+          textInputAction: (isLastField)
+              ? TextInputAction.done
+              : TextInputAction.next,
           keyboardType: TextInputType.visiblePassword,
           obscureText: true,
           decoration: InputDecoration(
@@ -259,11 +263,17 @@ class _PageEditProfileState extends State<PageEditProfile> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        onPressed: () => _editProfile(),
+        onPressed: () => (_isButtonEnabled) ? _editProfile() : null,
       ),
     );
   }
 
+  /// Check forms, then call [_buildMapProfile] to get a map of the modified
+  /// values. If the acquired map is empty, shows an error [SnackBar] ; in the
+  /// other case, calls [editUserProfile].
+  /// The basic [Form] and the password [Form] are checked separately : The user
+  /// can edit his profile without changing his password, but, if he wants to
+  /// update it, his current password is required.
   void  _editProfile() {
     if (!_formKey.currentState.validate())
       return ;
@@ -272,8 +282,11 @@ class _PageEditProfileState extends State<PageEditProfile> {
       return ;
 
     Map newProfileValues = _buildMapProfile() ;
+    newProfileValues.forEach((key, value) {
+      print("KEY = $key | VALUE = $value");
+    });
     if (newProfileValues.isNotEmpty)
-      editUserProfile(newProfileValues);
+      editUserProfile(newProfileValues).then((value) => handleEditionComplete(value));
     else
       Scaffold.of(_scaffoldContext).showSnackBar(
         SnackBar(
@@ -282,25 +295,53 @@ class _PageEditProfileState extends State<PageEditProfile> {
       );
   }
 
+  /// Generate a [Map] containing all the values of the user's profile.
+  /// This [Map] will be converted into json when calling the API.
   Map   _buildMapProfile() {
     Map result = Map() ;
 
     if (_nameEditingController.text != _profile.name)
-      result.putIfAbsent("name", () => _nameEditingController.text);
+      result.putIfAbsent("Name", () => _nameEditingController.text);
+    else
+      result.putIfAbsent("Name", () => _profile.name);
     if (_surnameEditingController.text != _profile.surname)
-      result.putIfAbsent("surname", () => _surnameEditingController.text);
+      result.putIfAbsent("Surname", () => _surnameEditingController.text);
+    else
+      result.putIfAbsent("Surname", () => _profile.surname);
     if (_emailEditingController.text != _profile.mail)
-      result.putIfAbsent("mail", () => _surnameEditingController.text);
+      result.putIfAbsent("Mail", () => _emailEditingController.text);
+    else
+      result.putIfAbsent("Mail", () => _profile.mail);
     if (_phoneEditingController.text != _profile.phone)
-      result.putIfAbsent("phone", () => _phoneEditingController.text);
+      result.putIfAbsent("Phone", () => _phoneEditingController.text);
+    else
+      result.putIfAbsent("Phone", () => _profile.phone);
     if (_birthDayController.text != _profile.birth)
-      result.putIfAbsent("birth", () => _birthDayController.text);
+      result.putIfAbsent("Birth", () => _birthDayController.text);
+    else
+      result.putIfAbsent("Birth", () => _profile.birth);
     if (_passwordEditingController.text.isNotEmpty
         && _newPasswordEditingController.text.isNotEmpty) {
-      result.putIfAbsent("pass", () => _passwordEditingController.text);
-      result.putIfAbsent("newPass", () => _newPasswordEditingController.text);
+      result.putIfAbsent("Pass", () => _passwordEditingController.text);
+      result.putIfAbsent("NewPass", () => _newPasswordEditingController.text);
     }
 
     return (result);
+  }
+
+  void    handleEditionComplete(int statusCode) {
+    setState(() {
+      _isButtonEnabled = false ;
+    });
+    switch (statusCode) {
+      case -1 :
+        showServerUnavailableSnackBar(_scaffoldContext);
+        break ;
+      case 0 :
+        Navigator.of(context).pop(true);
+        break ;
+      default:
+        showDummyErrorSnackBar(_scaffoldContext);
+    }
   }
 }

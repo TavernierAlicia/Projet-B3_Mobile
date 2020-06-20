@@ -87,7 +87,7 @@ class _PageRegisterState extends State<PageRegister> {
                           context,
                           "Confirmez mot de passe",
                           "Confirmez votre mot de passe",
-                          passwordConfirmValidator,
+                          _passwordConfirmValidator,
                           _confPassController,
                           obscureText: true,
                         ),
@@ -213,5 +213,14 @@ class _PageRegisterState extends State<PageRegister> {
         }),
       ),
     );
+  }
+
+  String    _passwordConfirmValidator(String value) {
+    if (value.isEmpty)
+      return ("Ce champ est obligatoire.");
+    else if (value != _passwordController.text)
+      return ("Les mots de passe ne correspondent pas.}");
+    else
+      return (null) ;
   }
 }

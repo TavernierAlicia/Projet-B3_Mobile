@@ -65,16 +65,6 @@ String    passwordValidator(String value) {
     return (null) ;
 }
 
-String    passwordConfirmValidator(String value,
-    TextEditingController passwordController) {
-  if (value.isEmpty)
-    return ("Ce champ est obligatoire.");
-  else if (value != passwordController.text)
-    return ("Les mots de passe ne correspondent pas.}");
-  else
-    return (null) ;
-}
-
 String    phoneNumberValidator(String value) {
   Pattern   pattern = r'^(?:[+0]9)?[0-9]{10}$' ;
   RegExp    regex = RegExp(pattern);
@@ -97,6 +87,24 @@ void            showFeatureNotReadySnackBar(BuildContext context) {
   Scaffold.of(context).showSnackBar(
     SnackBar(
       content: Text("Désolé, cette fonctionnalité n'est pas encore disponible."),
+      duration: Duration(seconds: 2),
+    ),
+  );
+}
+
+void            showServerUnavailableSnackBar(BuildContext context) {
+  Scaffold.of(context).showSnackBar(
+    SnackBar(
+      content: Text("Vous n'êtes pas connecté à Internet ou le serveur est en maintenance."),
+      duration: Duration(seconds: 2),
+    ),
+  );
+}
+
+void            showDummyErrorSnackBar(BuildContext context) {
+  Scaffold.of(context).showSnackBar(
+    SnackBar(
+      content: Text("Une erreur s'est produite."),
       duration: Duration(seconds: 2),
     ),
   );
