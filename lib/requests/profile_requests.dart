@@ -17,3 +17,13 @@ Future<Profile>     getUserProfile() async {
   var profile = data.map<Profile>((json) => Profile.fromJson(json)).toList() ;
   return profile[0] ;
 }
+
+Future<String>    editUserProfile(Map newProfileValues) async {
+  String      url = BASE_URL + "profile/edit" ;
+  JsonEncoder jsonEncoder = JsonEncoder() ;
+  String      jsonBody = jsonEncoder.convert(newProfileValues);
+
+  print("EDIT USER PROFILE ; JSON : \n$jsonBody") ;
+
+  return ("END");
+}

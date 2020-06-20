@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:projet_b3/model/profile.dart';
+import 'package:projet_b3/requests/profile_requests.dart';
 import 'package:projet_b3/utils.dart';
-import 'package:projet_b3/views/form_item.dart';
 
 class PageEditProfile extends StatefulWidget {
   PageEditProfile({Key key, this.profile}) : super(key: key);
@@ -20,17 +20,28 @@ class _PageEditProfileState extends State<PageEditProfile> {
   TextEditingController   _nameEditingController = TextEditingController();
   TextEditingController   _surnameEditingController = TextEditingController();
   TextEditingController   _emailEditingController = TextEditingController();
+  TextEditingController   _phoneEditingController = TextEditingController();
+  TextEditingController   _birthDayController = TextEditingController();
   TextEditingController   _passwordEditingController = TextEditingController();
   TextEditingController   _newPasswordEditingController = TextEditingController();
-  // TODO : Birth edit
 
   Profile         _profile ;
+
+  @override
+  void initState() {
+    _profile = widget.profile ;
+    _nameEditingController.text = _profile.name ;
+    _surnameEditingController.text = _profile.surname ;
+    _emailEditingController.text = _profile.mail ;
+    _phoneEditingController.text = _profile.phone ;
+    _birthDayController.text = _profile.birth ;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
 
     _screenSize = MediaQuery.of(context).size ;
-    _profile = widget.profile ;
 
     return Scaffold(
       appBar: AppBar(
@@ -56,16 +67,9 @@ class _PageEditProfileState extends State<PageEditProfile> {
 
     _scaffoldContext = scaffoldContext ;
 
-
-    _nameEditingController.value = TextEditingValue(text: _profile.name) ;
-    _nameEditingController.selection = TextSelection.collapsed(offset: _profile.name.length);
-
-    _surnameEditingController.text = _profile.surname ;
-    _emailEditingController.text = _profile.mail ;
-
     return Padding(
       padding: EdgeInsets.only(left: 30, right: 30),
-      child: Center(
+      child: SingleChildScrollView(
         child: Column(
           children: <Widget>[
             Stack(
@@ -93,24 +97,178 @@ class _PageEditProfileState extends State<PageEditProfile> {
                 ),
               ],
             ),
-            TextFormField(
-              controller: _nameEditingController,
-              textInputAction: TextInputAction.next,
-              keyboardType: TextInputType.text,
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.grey[200],
-                border: OutlineInputBorder(
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              onFieldSubmitted: ((v) {
-                FocusScope.of(context).nextFocus();
-              }),
+            _textFormField(_nameEditingController, false),
+            _textFormField(_surnameEditingController, false),
+            _textFormField(_emailEditingController, false),
+            _textFormField(_phoneEditingController, true),
+            _birthDatePicker(),
+            _passwordTextFormField(_passwordEditingController, "Mot de passe", false),
+            _passwordTextFormField(_newPasswordEditingController, "Nouveau mot de passe", true),
+            Padding(
+              padding: EdgeInsets.only(top: 20, bottom: 20),
+              child: _editProfileButton(),
             ),
           ],
         ),
       ),
     );
+  }
+
+  Widget  _textFormField(TextEditingController controller, bool isLastField) {
+    return TextFormField(
+      initialValue: controller.value.text,
+      textInputAction: (isLastField) ? TextInputAction.done : TextInputAction.next,
+      keyboardType: TextInputType.text,
+      decoration: InputDecoration(
+        border: UnderlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.deepOrange,
+            )
+        ),
+      ),
+      onFieldSubmitted: ((v) {
+        if (!isLastField) FocusScope.of(context).nextFocus();
+        else FocusScope.of(context).unfocus();
+      }),
+      onChanged: ((value) {
+        controller.text = value ;
+        print("VALUE = $value | CONTROLLER TEXT = ${controller.text}");
+      }),
+    );
+  }
+
+  /// Create the birthDatePicker. As we need to change the state of the
+  ///   TextFormField, we need to create a StatefulBuilder.
+  Widget    _birthDatePicker() {
+    return StatefulBuilder(
+        builder: (BuildContext birthDayContext, StateSetter birthDaySetState) {
+
+          String birthDate = _profile.birth ;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(padding: EdgeInsets.only(top: 20),),
+              Text(
+                "Date de naissance",
+              ),
+              Padding(padding: EdgeInsets.all(5),),
+              TextFormField(
+                controller: _birthDayController,
+                readOnly: true,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.grey[200],
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                onTap: (() {
+                  print("Should open datePicker");
+                  showDatePicker(
+                    context: birthDayContext,
+                    initialDate: DateTime(1990),
+                    firstDate: DateTime(1970),
+                    lastDate: DateTime(DateTime.now().year - 18),
+                  ).then((value) {
+                    print("VALUE = $value") ;
+                    if (value == null) return ;
+                    birthDaySetState(() {
+                      _birthDayController.text = "${value.year}-${value.month}-${value.day}" ;
+                      birthDate = "test" ;
+                      print("birthDayController text = ${_birthDayController.text} | birthDate = $birthDate");
+                    });
+                  });
+                }),
+              ),
+            ],
+          );
+        }
+    );
+  }
+
+  Widget  _passwordTextFormField(TextEditingController controller, String title, bool isLastField) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(padding: EdgeInsets.only(top: 10),),
+        Text(
+          title,
+          textAlign: TextAlign.left,
+        ),
+        TextFormField(
+          textInputAction: (isLastField) ? TextInputAction.done : TextInputAction.next,
+          keyboardType: TextInputType.visiblePassword,
+          decoration: InputDecoration(
+            border: UnderlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.deepOrange,
+                )
+            ),
+          ),
+          onChanged: ((value) {
+            controller.text = value ;
+          }),
+          onFieldSubmitted: ((v) {
+            if (!isLastField) FocusScope.of(context).nextFocus();
+            else FocusScope.of(context).unfocus();
+          }),
+        ),
+      ],
+    );
+  }
+
+  Widget  _editProfileButton() {
+    return ButtonTheme(
+      /// Padding of parent avoid the button to touch screens borders
+      minWidth: _screenSize.width,
+      height: 50,
+      child: FlatButton(
+        color: Colors.deepOrange,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Text("Valider mon profil",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        onPressed: (() {
+          Map newProfileValues = _buildMapProfile() ;
+          if (newProfileValues.isNotEmpty)
+            editUserProfile(newProfileValues);
+          else
+            Scaffold.of(_scaffoldContext).showSnackBar(
+              SnackBar(
+                content: Text("Vous devez modifier au moins un champ !"),
+              ),
+            );
+        }),
+      ),
+    );
+  }
+
+  Map   _buildMapProfile() {
+    Map result = Map() ;
+
+    if (_nameEditingController.text != _profile.name)
+      result.putIfAbsent("name", () => _nameEditingController.text);
+    if (_surnameEditingController.text != _profile.surname)
+      result.putIfAbsent("surname", () => _surnameEditingController.text);
+    if (_emailEditingController.text != _profile.mail)
+      result.putIfAbsent("mail", () => _surnameEditingController.text);
+    if (_phoneEditingController.text != _profile.phone)
+      result.putIfAbsent("phone", () => _phoneEditingController.text);
+    if (_birthDayController.text != _profile.birth)
+      result.putIfAbsent("birth", () => _birthDayController.text);
+    if (_passwordEditingController.text.isNotEmpty
+        && _newPasswordEditingController.text.isNotEmpty) {
+      result.putIfAbsent("pass", () => _passwordEditingController.text);
+      result.putIfAbsent("newPass", () => _newPasswordEditingController.text);
+    }
+
+    return (result);
   }
 }
