@@ -6,11 +6,13 @@ import 'package:projet_b3/model/product.dart';
 import 'package:projet_b3/pages/page_cart.dart';
 import 'package:projet_b3/requests/order_requests.dart';
 import 'package:projet_b3/utils.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 class PageOrder extends StatefulWidget {
-  PageOrder({Key key, this.order}) : super(key: key);
+  PageOrder({Key key, this.order, this.orderId}) : super(key: key);
 
-  final Order order ;
+  final Order   order ;
+  final int     orderId ;
 
   @override
   _PageOrderState createState() => _PageOrderState();
@@ -26,7 +28,13 @@ class _PageOrderState extends State<PageOrder> {
 
   @override
   void initState() {
-    _orderDetailsFuture = getOrderDetails(widget.order.id) ;
+    if (widget.orderId != null) {
+      print("In page_order initState ; getting from orderId ${widget.orderId}");
+      _orderDetailsFuture = getOrderDetails(widget.orderId);
+    } else {
+      print("In page_order initState ; getting from ORDER ${widget.order.id}");
+      _orderDetailsFuture = getOrderDetails(widget.order.id);
+    }
     super.initState();
   }
 
@@ -62,10 +70,12 @@ class _PageOrderState extends State<PageOrder> {
     return FutureBuilder(
       future: _orderDetailsFuture,
       builder: (context, snapshot) {
-        return (snapshot.hasData)
-            ? _orderBody(snapshot.data as Order)
-            : Center(
-          child: CircularProgressIndicator(),
+        return (
+            (snapshot.hasData)
+                ? _orderBody(snapshot.data as Order)
+                : Center(
+              child: CircularProgressIndicator(),
+            )
         ) ;
       },
     );
@@ -94,6 +104,7 @@ class _PageOrderState extends State<PageOrder> {
         + "${_orderDetails.establishmentStreetName}, "
         + "${_orderDetails.establishmentCity}" ;
 
+    initializeDateFormatting("fr_FR");
     DateTime    parsedDate = DateTime.parse(_orderDetails.date);
     String      orderDate = DateFormat.yMMMd('fr_FR').format(DateTime.parse(_orderDetails.date));
     String      orderTime = "${parsedDate.hour}:${parsedDate.minute}";

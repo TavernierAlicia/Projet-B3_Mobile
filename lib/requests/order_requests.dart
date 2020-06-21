@@ -9,7 +9,7 @@ import 'package:http/http.dart';
 
 import '../utils.dart';
 
-Future<String>  takeOrder(int barId, List<Product> cartContent, int arrivingIn,
+Future<int>  takeOrder(int barId, List<Product> cartContent, int arrivingIn,
     int tip, PaymentMethod paymentMethod) async {
   String                url = BASE_URL + "takeOrder" ;
   Map<String, String>   headers = {
@@ -44,7 +44,19 @@ Future<String>  takeOrder(int barId, List<Product> cartContent, int arrivingIn,
 
   Response    response = await post(url, headers: headers, body: jsonBody);
   print("RESPONSE BODY = ${response.body}");
-  return response.body ;
+  try {
+    print("In try");
+    var data = jsonDecode(response.body);
+    print("Got data : $data ; code = ${data["code"]} | message = ${data["message"]}");
+    int code = data["code"] ;
+    print("CODE = $code");
+    if (data["code"] != null && data["code"] == 0 && data["message"] != null) {
+      return (data["message"]);
+    }
+  } catch (exception) {
+    print("EXCEPTION : $exception");
+  }
+  return -1 ;
 }
 
 Future<List<Order>>     getOrdersHistory() async {

@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:projet_b3/model/bar.dart';
+import 'package:projet_b3/model/order.dart';
 import 'package:projet_b3/model/product.dart';
 import 'package:projet_b3/pages/page_cart.dart';
+import 'package:projet_b3/pages/page_order.dart';
 import 'package:projet_b3/requests/order_requests.dart';
 
 class   PageTakeOrder extends StatefulWidget {
@@ -29,7 +31,7 @@ class _PageTakeOrderState extends State<PageTakeOrder> {
 
   double            _screenWidth = 0 ;
   double            _screenHeight = 0 ;
-  Future<String>    _orderStatus ;
+  Future<int>       _orderStatus ;
 
   @override
   void initState() {
@@ -54,7 +56,7 @@ class _PageTakeOrderState extends State<PageTakeOrder> {
         future: _orderStatus,
         builder: (context, snapshot) {
           if (snapshot.data != null) {
-            return _orderCompleteLayout();
+            return _orderCompleteLayout(snapshot.data);
           } else {
             return _loadingLayout();
           }
@@ -64,7 +66,7 @@ class _PageTakeOrderState extends State<PageTakeOrder> {
     );
   }
 
-  Widget    _orderCompleteLayout() {
+  Widget    _orderCompleteLayout(int orderId) {
     return Container(
       width: _screenWidth,
       height: _screenHeight,
@@ -106,7 +108,12 @@ class _PageTakeOrderState extends State<PageTakeOrder> {
           Padding(padding: EdgeInsets.all(20),),
           InkWell(
             onTap: (() {
-              // TODO
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => PageOrder(orderId: orderId,),
+                ),
+                ((route) => route.isFirst),
+              );
             }),
             child: Padding(
               padding: EdgeInsets.only(left: 50, right: 50),
@@ -138,7 +145,7 @@ class _PageTakeOrderState extends State<PageTakeOrder> {
           Padding(padding: EdgeInsets.all(10),),
           InkWell(
             onTap: (() {
-              // TODO
+              Navigator.of(context).popUntil((route) => route.isFirst);
             }),
             child: Padding(
               padding: EdgeInsets.only(left: 50, right: 50),
