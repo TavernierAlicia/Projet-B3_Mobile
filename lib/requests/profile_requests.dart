@@ -13,7 +13,6 @@ Future<Profile>     getUserProfile() async {
   } ;
 
   Response response = await get(url, headers: headers) ;
-  print("IN GET USER PROFILE ; BODY = ${response.body}");
   var data = jsonDecode(response.body) as List ;
   var profile = data.map<Profile>((json) => Profile.fromJson(json)).toList() ;
   return profile[0] ;
@@ -28,6 +27,7 @@ Future<int>         editUserProfile(Map newProfileValues) async {
   } ;
 
   Response response = await put(url, headers: headers, body: jsonBody) ;
+  print("RESPONSE BODY = ${response.body}");
   try {
     var data = jsonDecode(response.body);
     if (data["code"] == 0) saveUserToken(data["message"]);

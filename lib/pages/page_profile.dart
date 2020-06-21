@@ -84,7 +84,11 @@ class _PageProfileState extends State<PageProfile> {
               height: _screenSize.width / 2,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: Image.network(_userProfile.picture).image,
+                  image: Image.network(
+                      (_userProfile.picture.isNotEmpty)
+                          ? _userProfile.picture
+                          : "http://cdn.orderndrink.com/img/profile.png"
+                  ).image,
                 ),
               ),
             ),
@@ -163,6 +167,9 @@ class _PageProfileState extends State<PageProfile> {
     );
   }
 
+  /// Launch the [PageEditProfile] and wait for its result. If the user edited
+  /// it and saved it, a confirmation [SnackBar] is shown to the user and we
+  /// call the API to get the new [Profile].
   void      _goToEditProfile() async {
     final bool result = await Navigator.of(context).push(
       MaterialPageRoute(
@@ -173,10 +180,10 @@ class _PageProfileState extends State<PageProfile> {
       Scaffold.of(_scaffoldContext).showSnackBar(
         SnackBar(
           content: Text("Votre profil a été modifié !"),
+          backgroundColor: Colors.green,
           duration: Duration(seconds: 2),
         ),
       );
-    // TODO : Reload (get the user profile again)
     setState(() {
       _userProfileFuture = getUserProfile() ;
     });
