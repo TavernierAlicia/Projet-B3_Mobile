@@ -33,7 +33,7 @@ class _PageBarsState extends State<PageBars> {
 
   static List   _barTypes = [
     Filter('Tous', true),
-    Filter('Bar a vins', false),
+    Filter('Vins', false),
     Filter('Tapas', false),
     Filter('Rhum', false),
     Filter('Vodka', false),
@@ -455,7 +455,7 @@ class _PageBarsState extends State<PageBars> {
         print("Building searchResults");
         if (snapshot.hasData) {
           return SizedBox(
-            height: 150, // card height
+            height: 160, // card height
             width: _screenSize.width,
             child: Stack(
               children: <Widget>[

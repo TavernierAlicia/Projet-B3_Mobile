@@ -16,9 +16,10 @@ class Order {
   }
 
   Order.details(int id, int establishmentId, String establishmentName,
-      String pictureUrl, String date, double totalPrice, int tip, String status,
-      List<OrderItem> orderItems, int establishmentStreetNum,
-      String establishmentStreetName, String establishmentCity) {
+      String pictureUrl, String date, double totalPrice, String payment,
+      int tip, String status, List<OrderItem> orderItems,
+      int establishmentStreetNum, String establishmentStreetName,
+      String establishmentCity) {
     this.establishmentStreetNum = establishmentStreetNum ;
     this.establishmentStreetName = establishmentStreetName ;
     this.establishmentCity = establishmentCity ;
@@ -28,6 +29,7 @@ class Order {
     this.pictureUrl = pictureUrl ;
     this.date = date ;
     this.totalPrice = totalPrice.toDouble() ;
+    this.payment = payment ;
     this.tip = tip ;
     this.status = status ;
     this.orderItems = orderItems ;
@@ -85,6 +87,7 @@ class Order {
       command["Pic"],
       command["Date"],
       double.tryParse(command["Price"].toString()),
+      command["Payment"],
       command["Tip"],
       command["Status"],
       _orderItems,
@@ -100,6 +103,7 @@ class Order {
   String          pictureUrl ;
   String          date ;
   double          totalPrice ;
+  String          payment ;
   int             tip ;
   String          status ;
   List<OrderItem> orderItems ;

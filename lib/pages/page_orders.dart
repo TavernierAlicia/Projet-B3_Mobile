@@ -3,8 +3,11 @@ import 'package:projet_b3/model/bar.dart';
 import 'package:projet_b3/model/order.dart';
 import 'package:projet_b3/model/product.dart';
 import 'package:projet_b3/pages/page_cart.dart';
+import 'package:projet_b3/pages/page_order.dart';
 import 'package:projet_b3/requests/order_requests.dart';
 import 'package:projet_b3/views/order_item.dart';
+
+// TODO : RELOAD WHEN COMING BACK FROM ORDER AGAIN
 
 class PageOrders extends StatefulWidget {
   PageOrders({Key key}) : super(key: key);
@@ -63,12 +66,16 @@ class _PageOrdersState extends State<PageOrders> {
       physics: NeverScrollableScrollPhysics(),
       itemCount: orders.length,
       itemBuilder: (context, i) {
-        return orderItem(context, orders[i], orderAgain: _orderAgain);
+        return orderItem(context, orders[i], orderAgain: _orderAgain,
+          orderClicked: _orderClicked,);
       },
     );
   }
 
-  void    _orderAgain(Order order) {
+  /// Builds a new cart containing a [List] of [Product] items, and passes it to
+  /// the [PageCart]. We also wait for the page to finish, as we want to reload
+  /// the list of orders if the user confirms his command.
+  void    _orderAgain(Order order) async {
 
     List<Product>    cartContent = [] ;
 
@@ -110,6 +117,25 @@ class _PageOrdersState extends State<PageOrders> {
           );
         },
       ),
-    );
+    ).then((value) {
+      setState(() {
+        _ordersList = getOrdersHistory();
+      });
+    });
+  }
+
+  /// Triggered when the user clicks on an order, opens the [PageOrder].
+  /// We also wait for the page to finish as we need to reload the list if the
+  /// user used orderAgain feature.
+  void    _orderClicked(Order order) {
+    Navigator.of(context).push(
+        MaterialPageRoute(
+            builder: (context) => PageOrder(order: order)
+        )
+    ).then((value) {
+      setState(() {
+        _ordersList = getOrdersHistory();
+      });
+    });
   }
 }

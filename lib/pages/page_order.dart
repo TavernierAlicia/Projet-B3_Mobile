@@ -205,7 +205,7 @@ class _PageOrderState extends State<PageOrder> {
                 "Moyen de paiement :",
               ),
               Text(
-                "Nature", // TODO
+                _orderDetails.payment, // TODO
               ),
             ],
           ),
