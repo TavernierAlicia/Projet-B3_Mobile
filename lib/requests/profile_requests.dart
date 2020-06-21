@@ -17,3 +17,21 @@ Future<Profile>     getUserProfile() async {
   var profile = data.map<Profile>((json) => Profile.fromJson(json)).toList() ;
   return profile[0] ;
 }
+
+Future<int>         editUserProfile(Map newProfileValues) async {
+  String                url = BASE_URL + "profile/edit/" ;
+  JsonEncoder           jsonEncoder = JsonEncoder() ;
+  String                jsonBody = jsonEncoder.convert(newProfileValues);
+  Map<String, String>   headers = {
+    "Authorization" : "${getAuthorizationToken()}"
+  } ;
+
+  Response response = await put(url, headers: headers, body: jsonBody) ;
+  print("RESPONSE BODY = ${response.body}");
+  try {
+    var data = jsonDecode(response.body);
+    if (data["code"] == 0) saveUserToken(data["message"]);
+    return (data["code"]) ;
+  } catch (exception) {}
+  return (-1);
+}

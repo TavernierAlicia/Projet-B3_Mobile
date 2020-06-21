@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:projet_b3/model/profile.dart';
+import 'package:projet_b3/pages/page_edit_profile.dart';
 import 'package:projet_b3/requests/profile_requests.dart';
 
 class PageProfile extends StatefulWidget {
@@ -12,6 +13,7 @@ class PageProfile extends StatefulWidget {
 class _PageProfileState extends State<PageProfile> {
 
   Size              _screenSize ;
+  BuildContext      _scaffoldContext ;
 
   Future<Profile>   _userProfileFuture ;
   Profile           _userProfile ;
@@ -48,6 +50,7 @@ class _PageProfileState extends State<PageProfile> {
       body: FutureBuilder(
         future: _userProfileFuture,
         builder: (context, snapshot) {
+          _scaffoldContext = context ;
           if (snapshot.data != null) {
             _userProfile = snapshot.data as Profile ;
             return _profileBody() ;
@@ -81,7 +84,11 @@ class _PageProfileState extends State<PageProfile> {
               height: _screenSize.width / 2,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: Image.network(_userProfile.picture).image,
+                  image: Image.network(
+                      (_userProfile.picture.isNotEmpty)
+                          ? _userProfile.picture
+                          : "http://cdn.orderndrink.com/img/profile.png"
+                  ).image,
                 ),
               ),
             ),
@@ -155,11 +162,31 @@ class _PageProfileState extends State<PageProfile> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        onPressed: (() {
-          // TODO
-        }),
+        onPressed: () => _goToEditProfile(),
       ),
     );
+  }
+
+  /// Launch the [PageEditProfile] and wait for its result. If the user edited
+  /// it and saved it, a confirmation [SnackBar] is shown to the user and we
+  /// call the API to get the new [Profile].
+  void      _goToEditProfile() async {
+    final bool result = await Navigator.of(context).push(
+      MaterialPageRoute(
+          builder: (context) => PageEditProfile(profile: _userProfile,)
+      ),
+    );
+    if (result != null && result == true)
+      Scaffold.of(_scaffoldContext).showSnackBar(
+        SnackBar(
+          content: Text("Votre profil a été modifié !"),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    setState(() {
+      _userProfileFuture = getUserProfile() ;
+    });
   }
 
 }
