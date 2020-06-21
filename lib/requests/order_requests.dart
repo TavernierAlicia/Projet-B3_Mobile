@@ -9,7 +9,7 @@ import 'package:http/http.dart';
 
 import '../utils.dart';
 
-Future<String>  takeOrder(int barId, List<Product> cartContent, int arrivingIn,
+Future<int>  takeOrder(int barId, List<Product> cartContent, int arrivingIn,
     int tip, PaymentMethod paymentMethod) async {
   String                url = BASE_URL + "takeOrder" ;
   Map<String, String>   headers = {
@@ -42,7 +42,13 @@ Future<String>  takeOrder(int barId, List<Product> cartContent, int arrivingIn,
 
   Response    response = await post(url, headers: headers, body: jsonBody);
   print("RESPONSE BODY = ${response.body}");
-  return response.body ;
+  try {
+    var data = jsonDecode(response.body);
+    if (data["code"] && data["code"] == 0 && data["message"]) {
+      return (data["message"]);
+    }
+  } catch (exception) {}
+  return -1 ;
 }
 
 Future<List<Order>>     getOrdersHistory() async {
@@ -56,4 +62,16 @@ Future<List<Order>>     getOrdersHistory() async {
   var ordersList = data.map<Order>((json) => Order.fromJson(json)).toList();
 
   return ordersList ;
+}
+
+Future<Order>         getOrder(int orderId) async {
+  String                url = BASE_URL + "getOrder/" + orderId.toString() ;
+  Map<String, String>   headers = {
+    "Authorization" : "${getAuthorizationToken()}"
+  } ;
+
+  Response      response = await get(url, headers: headers) ;
+  var data = jsonDecode(response.body) as Order ;
+
+  return (data) ;
 }

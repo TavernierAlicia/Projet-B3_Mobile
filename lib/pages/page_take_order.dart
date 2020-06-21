@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:projet_b3/model/bar.dart';
+import 'package:projet_b3/model/order.dart';
 import 'package:projet_b3/model/product.dart';
 import 'package:projet_b3/pages/page_cart.dart';
 import 'package:projet_b3/pages/page_order.dart';
@@ -30,7 +31,7 @@ class _PageTakeOrderState extends State<PageTakeOrder> {
 
   double            _screenWidth = 0 ;
   double            _screenHeight = 0 ;
-  Future<String>    _orderStatus ;
+  Future<int>       _orderStatus ;
 
   @override
   void initState() {
@@ -55,7 +56,7 @@ class _PageTakeOrderState extends State<PageTakeOrder> {
         future: _orderStatus,
         builder: (context, snapshot) {
           if (snapshot.data != null) {
-            return _orderCompleteLayout();
+            return _orderCompleteLayout(snapshot.data);
           } else {
             return _loadingLayout();
           }
@@ -65,7 +66,7 @@ class _PageTakeOrderState extends State<PageTakeOrder> {
     );
   }
 
-  Widget    _orderCompleteLayout() {
+  Widget    _orderCompleteLayout(int orderId) {
     return Container(
       width: _screenWidth,
       height: _screenHeight,
@@ -109,7 +110,7 @@ class _PageTakeOrderState extends State<PageTakeOrder> {
             onTap: (() {
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(
-                  builder: (context) => PageOrder()   // TODO : Give order id
+                  builder: (context) => PageOrder(orderId: orderId,),
                 ),
                 ((route) => route.isFirst),
               );
