@@ -5,7 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:projet_b3/pages/page_order.dart';
 
-Widget orderItem(context, Order order, { orderAgain(Order order) }) {
+Widget orderItem(context, Order order, { orderAgain(Order order),
+  orderClicked(Order order) }) {
 
   double _screenWidth = MediaQuery.of(context).size.width ;
   initializeDateFormatting("fr_FR");
@@ -14,11 +15,7 @@ Widget orderItem(context, Order order, { orderAgain(Order order) }) {
     padding: EdgeInsets.only(left: 15, top: 15, right: 15),
     child: InkWell(
       onTap: (() {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => PageOrder(order: order)
-          )
-        );
+        orderClicked(order);
       }),
       child: Card(
         elevation: 10,
