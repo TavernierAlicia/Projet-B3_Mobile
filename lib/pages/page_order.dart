@@ -28,13 +28,10 @@ class _PageOrderState extends State<PageOrder> {
 
   @override
   void initState() {
-    if (widget.orderId != null) {
-      print("In page_order initState ; getting from orderId ${widget.orderId}");
+    if (widget.orderId != null)
       _orderDetailsFuture = getOrderDetails(widget.orderId);
-    } else {
-      print("In page_order initState ; getting from ORDER ${widget.order.id}");
+    else
       _orderDetailsFuture = getOrderDetails(widget.order.id);
-    }
     super.initState();
   }
 
@@ -108,7 +105,6 @@ class _PageOrderState extends State<PageOrder> {
     DateTime    parsedDate = DateTime.parse(_orderDetails.date);
     String      orderDate = DateFormat.yMMMd('fr_FR').format(DateTime.parse(_orderDetails.date));
     String      orderTime = "${parsedDate.hour}:${parsedDate.minute}";
-    print("ORDER DATE = $orderDate");
 
     return Column(
       children: <Widget>[
@@ -181,7 +177,7 @@ class _PageOrderState extends State<PageOrder> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Text("Pourboire"),
-              Text("TODO €"), // TODO
+              Text("${_orderDetails.tip} €"),
             ],
           ),
           Row(

@@ -1,12 +1,10 @@
-import 'package:projet_b3/model/bar.dart';
-
 class Order {
 
   Order(int id, int establishmentId, String establishmentName,
       String pictureUrl, String date, double totalPrice, String status,
       List<OrderItem> orderItems,) {
 
-    print("DEFAULT CONSTRUCTOR ID = $id");
+    print("DEFAULT CONSTRUCTOR ID = $id | TIP = $tip");
     this.id = id ;
     this.establishmentId = establishmentId ;
     this.establishmentName = establishmentName ;
@@ -18,7 +16,7 @@ class Order {
   }
 
   Order.details(int id, int establishmentId, String establishmentName,
-      String pictureUrl, String date, double totalPrice, String status,
+      String pictureUrl, String date, double totalPrice, int tip, String status,
       List<OrderItem> orderItems, int establishmentStreetNum,
       String establishmentStreetName, String establishmentCity) {
     this.establishmentStreetNum = establishmentStreetNum ;
@@ -30,6 +28,7 @@ class Order {
     this.pictureUrl = pictureUrl ;
     this.date = date ;
     this.totalPrice = totalPrice.toDouble() ;
+    this.tip = tip ;
     this.status = status ;
     this.orderItems = orderItems ;
   }
@@ -86,6 +85,7 @@ class Order {
       command["Pic"],
       command["Date"],
       double.tryParse(command["Price"].toString()),
+      command["Tip"],
       command["Status"],
       _orderItems,
       command["EtabStreetNum"],
@@ -100,6 +100,7 @@ class Order {
   String          pictureUrl ;
   String          date ;
   double          totalPrice ;
+  int             tip ;
   String          status ;
   List<OrderItem> orderItems ;
   int             establishmentStreetNum ;
