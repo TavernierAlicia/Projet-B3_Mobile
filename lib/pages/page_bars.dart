@@ -33,12 +33,12 @@ class _PageBarsState extends State<PageBars> {
 
   static List   _barTypes = [
     Filter('Tous', true),
-    Filter('Vins', false),
+    Filter('Vin', false),
     Filter('Tapas', false),
     Filter('Rhum', false),
     Filter('Vodka', false),
     Filter('Tequila', false),
-    Filter('Cocktail', false),
+    Filter('Cocktails', false),
     Filter('Chicha', false),
     Filter('Whiskey', false),
   ];
