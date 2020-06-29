@@ -1,4 +1,4 @@
-package com.elynad.projet_b3
+package com.tavernieralicia.orderndrink
 
 import android.os.Bundle
 
