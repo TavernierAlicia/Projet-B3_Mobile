@@ -4,6 +4,8 @@ import 'package:projet_b3/pages/page_main.dart';
 import 'package:projet_b3/requests/utils.dart';
 import 'package:projet_b3/singleton.dart';
 
+import '../utils.dart';
+
 class PageRegisterConfirm extends StatefulWidget {
   PageRegisterConfirm({Key key, this.email, this.password}) : super(key: key);
 
@@ -20,6 +22,8 @@ class _PageRegisterConfirmState extends State<PageRegisterConfirm> {
 
   @override
   Widget build(BuildContext context) {
+
+    _performLogin();
 
     _screenSize = MediaQuery.of(context).size ;
 
@@ -81,7 +85,7 @@ class _PageRegisterConfirmState extends State<PageRegisterConfirm> {
           ),
         ),
         onPressed: (() {
-          _performLoginAndGoTo(
+          _goToNextPage(
             MaterialPageRoute(
               builder: (context) => MainPage(),
             ),
@@ -108,7 +112,7 @@ class _PageRegisterConfirmState extends State<PageRegisterConfirm> {
           ),
         ),
         onPressed: (() {
-          _performLoginAndGoTo(
+          _goToNextPage(
             MaterialPageRoute(
               builder: (context) => MainPage(selectedPageDefault: 3,),
             ),
@@ -117,15 +121,13 @@ class _PageRegisterConfirmState extends State<PageRegisterConfirm> {
       ),
     );
   }
-
-  void      _performLoginAndGoTo(MaterialPageRoute pageToGo) {
+  
+  void      _performLogin() {
     login(widget.email, widget.password).then((value) {
       if (value[0] as int == SERVER_RESPONSE_NO_ERROR) {
         var singletonInstance = Singleton.instance ;
         singletonInstance.hashKey = value[1] as String ;
-        Navigator.of(context).pushReplacement(
-          pageToGo,
-        );
+        saveUserToken(value[1] as String);
       } else {
         Scaffold.of(context).showSnackBar(
           SnackBar(
@@ -134,5 +136,11 @@ class _PageRegisterConfirmState extends State<PageRegisterConfirm> {
         );
       }
     });
+  }
+
+  void      _goToNextPage(MaterialPageRoute pageToGo) {
+    Navigator.of(context).pushReplacement(
+      pageToGo,
+    );
   }
 }

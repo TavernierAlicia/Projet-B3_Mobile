@@ -198,6 +198,7 @@ class _PageRegisterState extends State<PageRegister> {
                   ),
                 );
               } else {
+                Navigator.pop(context);
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
